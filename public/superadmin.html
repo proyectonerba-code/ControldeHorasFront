@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <script src="/api-client.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#760009">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/jjmclock-192.png">
+  <title>JJMClock · Superadministración</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+  <style>
+    :root{--red:#8e1018;--red-dark:#68070d;--ink:#192033;--muted:#657087;--line:#e4e8ef;--wash:#f5f7fb;--white:#fff;--green:#087b56;--amber:#a85e06;--shadow:0 14px 38px rgba(20,31,54,.08)}
+    *{box-sizing:border-box}body{margin:0;background:var(--wash);color:var(--ink);font-family:'DM Sans',sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.hidden{display:none!important}
+    .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at top right,#f6e5e5,transparent 48%),var(--wash)}.auth-card{width:min(100%,440px);background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:var(--shadow)}.brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}.brand img{width:46px;height:46px;object-fit:contain;border-radius:12px}.brand strong{display:block;font:800 19px Manrope,sans-serif;letter-spacing:-.04em}.brand span{font-size:12px;color:var(--muted)}.auth-card h1{font:800 25px Manrope,sans-serif;letter-spacing:-.04em;margin:0 0 6px}.auth-card>p{color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 22px}.auth-fields{display:grid;gap:13px}.field{display:grid;gap:6px}.field label{font-size:12px;font-weight:700;color:#3d475b}.field input,.field select,.field textarea{width:100%;border:1px solid #d7dce6;border-radius:9px;padding:11px 12px;background:#fff;color:var(--ink);outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px #8e10181c}.primary-btn,.secondary-btn,.danger-btn,.ghost-btn{border:0;border-radius:9px;padding:10px 14px;font-weight:700;transition:.16s}.primary-btn{background:var(--red);color:#fff}.primary-btn:hover{background:var(--red-dark);transform:translateY(-1px)}.secondary-btn{background:#f1f3f7;color:var(--ink)}.secondary-btn:hover,.ghost-btn:hover{background:#e7ebf2}.danger-btn{background:#fff0f0;color:#a30d18}.danger-btn:hover{background:#ffe2e3}.ghost-btn{border:1px solid var(--line);background:#fff;color:#354058}.full{width:100%;margin-top:5px}.inline-message{font-size:13px;line-height:1.5;color:#a32028;margin-top:14px}.help-box{margin-top:16px;padding:12px;border-radius:10px;background:#fff8e8;color:#68420e;font-size:12px;line-height:1.5}.auth-switch{display:block;margin-top:18px;text-align:center;color:var(--muted);font-size:12px}.auth-switch:hover{color:var(--red)}
+    .shell{min-height:100vh;display:grid;grid-template-columns:248px minmax(0,1fr)}.sidebar{background:#fff;border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh}.sidebar .brand{padding:0 9px;margin:0}.side-caption{padding:0 10px;color:#9098a8;text-transform:uppercase;font-size:10px;font-weight:800;letter-spacing:.15em}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;text-align:left;display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;color:#536078;font-weight:600;font-size:13px}.nav button .material-symbols-outlined{font-size:19px}.nav button:hover{background:#f7f1f1;color:var(--red)}.nav button.active{background:#fbebec;color:var(--red);font-weight:800}.side-footer{margin-top:auto;padding:12px;border-radius:12px;background:#f6f7fa;color:var(--muted);font-size:11px;line-height:1.5}.main{min-width:0}.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:5}.topbar-left{display:flex;align-items:center;gap:12px}.topbar h1{font:800 18px Manrope,sans-serif;margin:0;letter-spacing:-.03em}.topbar small{display:block;margin-top:3px;color:var(--muted);font-size:11px}.top-actions{display:flex;gap:8px;align-items:center}.icon-btn{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:8px 11px;background:#fff;border:1px solid var(--line);border-radius:9px;color:#475169;font-size:12px;font-weight:700}.icon-btn:hover{border-color:#d3a6a9;color:var(--red)}.page{max-width:1500px;margin:auto;padding:25px 30px 45px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:7px}.page-heading{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:22px}.page-heading h2{font:800 26px Manrope,sans-serif;letter-spacing:-.045em;margin:0}.page-heading p{font-size:13px;color:var(--muted);margin:7px 0 0}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:20px}.stat-card,.panel{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 3px 14px rgba(20,31,54,.025)}.stat-card{padding:17px 18px;display:flex;justify-content:space-between;align-items:center}.stat-label{font-size:11px;color:var(--muted);font-weight:700}.stat-value{font:800 25px Manrope,sans-serif;margin-top:6px;letter-spacing:-.04em}.stat-icon{width:40px;height:40px;border-radius:12px;background:#f9ebec;color:var(--red);display:grid;place-items:center}.stat-icon .material-symbols-outlined{font-size:20px}.panel{overflow:hidden}.toolbar{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.toolbar-title{font-weight:800;font-size:13px;display:flex;align-items:center;gap:8px}.toolbar-title .material-symbols-outlined{font-size:19px;color:var(--red)}.toolbar-tools{display:flex;gap:8px;align-items:center}.search{width:min(260px,42vw);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:12px;outline:0}.search:focus{border-color:var(--red)}.table-wrap{overflow:auto}.data-table{width:100%;border-collapse:collapse;min-width:940px}.data-table th{padding:11px 13px;text-align:left;background:#f8f9fc;color:#7b8497;text-transform:uppercase;font-size:9px;letter-spacing:.12em;white-space:nowrap}.data-table td{padding:13px;border-top:1px solid #eef0f4;vertical-align:middle;font-size:12px}.data-table tr:hover td{background:#fcfcfe}.company-name{font-weight:800;color:#232d42;font-size:13px}.muted{color:var(--muted);font-size:11px;margin-top:3px}.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:100px;background:#eef1f5;color:#566176;font-size:10px;font-weight:800;white-space:nowrap}.pill::before{content:'';width:6px;height:6px;background:currentColor;border-radius:50%}.pill.active{background:#e6f7ef;color:#087b56}.pill.pending{background:#fff4df;color:#a85e06}.pill.denied{background:#fff0f0;color:#a32028}.pill.expired{background:#fff0e7;color:#a84c12}.code{display:inline-flex;gap:5px;align-items:center;font:700 11px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:#5a1720}.code-copy{border:0;background:transparent;padding:2px;color:#8790a0}.code-copy:hover{color:var(--red)}.actions{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap}.small-btn{padding:7px 9px;border-radius:7px;font-size:10px;white-space:nowrap}.empty{padding:36px 20px;text-align:center;color:var(--muted);font-size:13px}.empty .material-symbols-outlined{font-size:30px;color:#bbc1cd;display:block;margin-bottom:8px}.audit-list{display:grid}.audit-row{padding:14px 16px;border-bottom:1px solid #eef0f4;display:flex;gap:12px;align-items:flex-start}.audit-dot{width:32px;height:32px;border-radius:10px;background:#f9ebec;color:var(--red);display:grid;place-items:center;flex:none}.audit-row strong{font-size:12px}.audit-row p{margin:4px 0;color:var(--muted);font-size:11px}.audit-row time{font-size:10px;color:#9299a7}.modal-backdrop{position:fixed;inset:0;background:#1118278a;z-index:20;display:grid;place-items:center;padding:18px}.modal{width:min(100%,600px);max-height:min(90vh,850px);overflow:auto;background:#fff;border-radius:16px;box-shadow:0 24px 80px #0c142b44}.modal-head{padding:18px 21px;background:var(--red-dark);color:#fff;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.modal-head h3{margin:0;font:800 16px Manrope,sans-serif}.modal-head p{margin:5px 0 0;color:#f0cfd1;font-size:11px}.modal-close{border:0;background:transparent;color:#fff;font-size:25px;line-height:1}.modal-body{padding:21px}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.modal-foot{padding:14px 21px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}.toast{position:fixed;bottom:20px;right:20px;z-index:30;background:#192033;color:#fff;border-radius:11px;padding:13px 16px;box-shadow:var(--shadow);font-size:12px;max-width:min(360px,90vw)}.toast.error{background:#9f1520}.notice{padding:12px 14px;background:#fff6e7;border:1px solid #f4dfb7;border-radius:10px;color:#795015;font-size:11px;line-height:1.55;margin-bottom:13px}.subtle{font-size:10px;color:var(--muted);line-height:1.45}.mobile-menu{display:none}
+    @media(max-width:1050px){.shell{grid-template-columns:210px minmax(0,1fr)}.page{padding:20px}.topbar{padding:0 20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:760px){.shell{display:block}.sidebar{height:auto;position:static;padding:10px 12px 7px;gap:7px;border-right:0;border-bottom:1px solid var(--line)}.sidebar .brand{display:none}.side-caption,.side-footer{display:none}.nav{display:flex;overflow-x:auto;gap:4px}.nav button{min-width:max-content;padding:9px 10px;font-size:11px}.nav button .material-symbols-outlined{font-size:16px}.topbar{position:static;height:auto;padding:12px 14px}.topbar h1{font-size:15px}.topbar small{display:none}.top-actions{gap:5px}.icon-btn{font-size:10px;padding:7px}.page{padding:16px 12px 30px}.page-heading{align-items:flex-start;flex-direction:column}.page-heading h2{font-size:22px}.stats{gap:8px}.stat-card{padding:13px}.stat-value{font-size:21px}.toolbar{align-items:flex-start;flex-direction:column}.toolbar-tools{width:100%}.search{width:100%}.modal-grid{grid-template-columns:1fr}.auth-card{padding:25px 21px}}
+  </style>
+</head>
+<body>
+  <section id="authScreen" class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand"><img src="/logo-jjm.jpg" alt="JJMClock"><div><strong>JJMClock</strong><span>Centro de control global</span></div></div>
+      <h1 id="authTitle">Acceso superadmin</h1>
+      <p id="authDescription">Administra equipos, membresías, cupos y códigos de invitación.</p>
+      <form id="loginForm" class="auth-fields">
+        <div class="field"><label for="loginEmail">Correo</label><input id="loginEmail" type="email" autocomplete="username" required></div>
+        <div class="field"><label for="loginPassword">Contraseña</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
+        <button class="primary-btn full" type="submit">Entrar al centro de control</button>
+      </form>
+      <form id="setupForm" class="auth-fields hidden">
+        <div class="notice">Configuración inicial de una sola vez. En local, la clave aparece en la consola del servidor; en producción se define mediante SUPERADMIN_SETUP_TOKEN.</div>
+        <div class="field"><label for="setupToken">Clave de configuración</label><input id="setupToken" type="password" autocomplete="off" required></div>
+        <div class="field"><label for="setupName">Tu nombre</label><input id="setupName" autocomplete="name" required></div>
+        <div class="field"><label for="setupEmail">Correo de superadmin</label><input id="setupEmail" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="setupPassword">Contraseña (mínimo 12 caracteres)</label><input id="setupPassword" type="password" minlength="12" autocomplete="new-password" required></div>
+        <button class="primary-btn full" type="submit">Crear mis credenciales</button>
+      </form>
+      <div id="authMessage" class="inline-message" role="alert"></div>
+      <div id="setupHelp" class="help-box hidden">Reinicia el servidor actualizado. La clave provisional se pega en el campo «Clave de configuración», nunca en «Contraseña».</div>
+      <a class="auth-switch" href="/login.html">Volver al acceso de JJMClock</a>
+    </div>
+  </section>
+
+  <div id="application" class="shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><img src="/logo-jjm.jpg" alt="JJMClock"><div><strong>JJMClock</strong><span>Superadministración</span></div></div>
+      <div class="side-caption">Operación</div>
+      <nav class="nav" aria-label="Panel superadmin">
+        <button class="active" data-view="solicitudes"><span class="material-symbols-outlined">inbox</span>Solicitudes</button>
+        <button data-view="equipos"><span class="material-symbols-outlined">domain</span>Equipos y códigos</button>
+        <button data-view="cuotas"><span class="material-symbols-outlined">payments</span>Cuotas y periodos</button>
+        <button data-view="actividad"><span class="material-symbols-outlined">history</span>Actividad y pagos</button>
+      </nav>
+      <div class="side-footer"><b>JJMClock · Control global</b><br>Las activaciones, los pagos y los cambios de cupo quedan registrados en el historial.</div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left"><div><h1>Centro de control</h1><small id="helloSuperadmin">Cargando sesión…</small></div></div>
+        <div class="top-actions">
+          <button id="pushButton" class="icon-btn" type="button" onclick="activarPushSuperadmin()"><span class="material-symbols-outlined">notifications_active</span><span>Activar avisos</span></button>
+          <button class="icon-btn" type="button" onclick="actualizarEquipos()"><span class="material-symbols-outlined">refresh</span><span>Actualizar</span></button>
+          <button class="icon-btn" type="button" onclick="cerrarSuperadmin()"><span class="material-symbols-outlined">logout</span><span>Salir</span></button>
+        </div>
+      </header>
+      <div class="page">
+        <div class="page-heading"><div><div class="eyebrow">JJM Solutions · Operación de membresías</div><h2 id="viewTitle">Solicitudes de activación</h2><p id="viewSubtitle">Revisa los equipos nuevos, confirma su pago y activa sus códigos.</p></div></div>
+        <section class="stats" aria-label="Indicadores">
+          <article class="stat-card"><div><div class="stat-label">Solicitudes pendientes</div><div id="statPending" class="stat-value">—</div></div><div class="stat-icon"><span class="material-symbols-outlined">pending_actions</span></div></article>
+          <article class="stat-card"><div><div class="stat-label">Equipos activos</div><div id="statActive" class="stat-value">—</div></div><div class="stat-icon"><span class="material-symbols-outlined">verified</span></div></article>
+          <article class="stat-card"><div><div class="stat-label">Membresías por vencer</div><div id="statDue" class="stat-value">—</div></div><div class="stat-icon"><span class="material-symbols-outlined">event_upcoming</span></div></article>
+          <article class="stat-card"><div><div class="stat-label">Trabajadores activos</div><div id="statWorkers" class="stat-value">—</div></div><div class="stat-icon"><span class="material-symbols-outlined">groups</span></div></article>
+        </section>
+        <section id="teamsPanel" class="panel">
+          <div class="toolbar"><div class="toolbar-title"><span class="material-symbols-outlined">domain</span><span id="tableTitle">Equipos que requieren atención</span></div><div class="toolbar-tools"><input id="searchTeams" class="search" type="search" placeholder="Buscar equipo o administrador" aria-label="Buscar equipo"><select id="statusFilter" class="search" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option value="activa">Activos</option><option value="pendiente">Pendientes</option><option value="declinada">Declinados</option><option value="vencida">Vencidos</option></select></div></div>
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>Equipo / administrador</th><th>Estado</th><th>Cupos</th><th>Pago / periodo</th><th>Vigencia</th><th>Código de invitación</th><th style="text-align:right">Acciones</th></tr></thead><tbody id="teamsBody"><tr><td colspan="7" class="empty">Cargando equipos…</td></tr></tbody></table></div>
+        </section>
+        <section id="activityPanel" class="panel hidden"><div class="toolbar"><div class="toolbar-title"><span class="material-symbols-outlined">history</span>Movimientos recientes</div></div><div id="activityBody" class="audit-list"></div></section>
+      </div>
+    </main>
+  </div>
+
+  <div id="licenseModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <form id="licenseForm" class="modal">
+      <div class="modal-head"><div><h3 id="modalTitle">Aprobar equipo y crear código</h3><p id="modalCompany">Configura cupos y vigencia de la membresía.</p></div><button type="button" class="modal-close" aria-label="Cerrar" onclick="cerrarModal('licenseModal')">×</button></div>
+      <div class="modal-body">
+        <div class="notice">Al guardar se activará el equipo y se generará su código de invitación. El precio puede ajustarse manualmente según el acuerdo comercial.</div>
+        <div class="modal-grid">
+          <div class="field"><label for="licenseSeats">Cupos contratados</label><input id="licenseSeats" type="number" min="1" max="10000" required></div>
+          <div class="field"><label for="licensePeriod">Periodicidad</label><select id="licensePeriod"><option value="mensual">Mensual</option><option value="anual">Anual</option></select></div>
+          <div class="field"><label for="licensePaid">Pago verificado (MXN)</label><input id="licensePaid" type="number" min="0" step="0.01" placeholder="0.00"></div>
+          <div class="field"><label for="licenseRecurring">Precio por periodo (MXN)</label><input id="licenseRecurring" type="number" min="0" step="0.01" required placeholder="0.00"></div>
+          <div class="field"><label for="licenseStart">Inicio</label><input id="licenseStart" type="date" required></div>
+          <div class="field"><label for="licenseEnd">Vigente hasta</label><input id="licenseEnd" type="date" required></div>
+        </div>
+        <div class="field" style="margin-top:13px"><label for="licenseNote">Nota interna / referencia del pago</label><textarea id="licenseNote" rows="2" placeholder="Referencia, transferencia, promoción o acuerdo"></textarea></div>
+      </div>
+      <div class="modal-foot"><button class="secondary-btn" type="button" onclick="cerrarModal('licenseModal')">Cancelar</button><button id="saveLicense" class="primary-btn" type="submit">Aprobar y generar código</button></div>
+    </form>
+  </div>
+  <div id="paymentModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+    <form id="paymentForm" class="modal" style="max-width:470px">
+      <div class="modal-head"><div><h3 id="paymentTitle">Registrar pago y renovar</h3><p id="paymentCompany">El pago quedará visible en el panel del administrador.</p></div><button type="button" class="modal-close" aria-label="Cerrar" onclick="cerrarModal('paymentModal')">×</button></div>
+      <div class="modal-body"><div class="auth-fields">
+        <div class="field"><label for="paymentAmount">Monto recibido (MXN)</label><input id="paymentAmount" type="number" min="0.01" step="0.01" required></div>
+        <div class="field"><label for="paymentEnd">Nueva fecha de vencimiento</label><input id="paymentEnd" type="date" required></div>
+        <div class="field"><label for="paymentNote">Referencia / nota</label><textarea id="paymentNote" rows="2" placeholder="Pago verificado por transferencia"></textarea></div>
+      </div></div>
+      <div class="modal-foot"><button class="secondary-btn" type="button" onclick="cerrarModal('paymentModal')">Cancelar</button><button class="primary-btn" type="submit">Registrar pago</button></div>
+    </form>
+  </div>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <script src="/push-client.js"></script>
+  <script>
+    const allViews = {
+      solicitudes: ['Solicitudes de activación', 'Revisa los equipos nuevos, confirma su pago y activa sus códigos.', 'Equipos que requieren atención'],
+      equipos: ['Equipos y códigos', 'Administra el acceso, la capacidad y los códigos de invitación.', 'Todos los equipos activos'],
+      cuotas: ['Cuotas y periodos', 'Controla los cupos contratados, los pagos y las próximas renovaciones.', 'Membresías y cupos'],
+      actividad: ['Actividad y pagos', 'Consulta los movimientos recientes del sistema y los pagos registrados.', 'Historial de operación']
+    };
+    let currentView = 'solicitudes';
+    let superadmin = null;
+    let equipos = [];
+    let licenciaEmpresaId = null;
+    let pagoEmpresaId = null;
+    const hoyISO = () => new Date().toLocaleDateString('sv-SE');
+    const byId = id => document.getElementById(id);
+    function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function mostrarToast(texto, error = false) { const t=byId('toast'); t.textContent=texto; t.classList.toggle('error',error); t.classList.remove('hidden'); clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.add('hidden'),4200); }
+    async function request(url, options={}) { const r=await fetch(url,{credentials:'same-origin',...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(options.headers||{})}}); const data=await r.json().catch(()=>({ok:false,error:'Respuesta inválida del servidor.'})); if(!r.ok||!data.ok) throw new Error(data.error||'No se pudo completar la operación.'); return data; }
+    function setAuthMessage(text, error=true) { byId('authMessage').textContent=text||''; byId('authMessage').style.color=error?'#a32028':'#087b56'; }
+    async function prepararAcceso() {
+      const estado=await fetch('/api/superadmin/setup/status').then(r=>r.json()).catch(()=>null);
+      if (!estado?.ok) {
+        byId('loginForm').classList.add('hidden'); byId('setupForm').classList.add('hidden'); byId('setupHelp').classList.remove('hidden');
+        byId('authTitle').textContent='Servidor pendiente de reinicio';
+        byId('authDescription').textContent='Esta página ya está actualizada, pero el servidor aún no cargó las rutas de superadmin.';
+        return;
+      }
+      if (estado?.setup_disponible) { byId('loginForm').classList.add('hidden'); byId('setupForm').classList.remove('hidden'); byId('authTitle').textContent='Crea tus credenciales'; byId('authDescription').textContent='Este registro solo se puede completar una vez.'; }
+      else if (estado && !estado.configurado) { byId('setupHelp').classList.remove('hidden'); byId('loginForm').classList.add('hidden'); byId('authTitle').textContent='Configuración requerida'; byId('authDescription').textContent='Inicia el servidor para habilitar el registro seguro de superadmin.'; }
+    }
+    async function cargarSesion() {
+      const data=await fetch('/api/superadmin/sesion').then(r=>r.json()).catch(()=>({ok:false}));
+      if (!data.ok) { byId('authScreen').classList.remove('hidden'); byId('application').classList.add('hidden'); await prepararAcceso(); return false; }
+      superadmin=data.superadmin; byId('helloSuperadmin').textContent=`Sesión de ${superadmin.nombre} · ${superadmin.correo}`; byId('authScreen').classList.add('hidden'); byId('application').classList.remove('hidden'); await actualizarEquipos(); return true;
+    }
+    byId('setupForm').addEventListener('submit',async e=>{e.preventDefault();setAuthMessage('');try{await request('/api/superadmin/setup',{method:'POST',body:JSON.stringify({token:byId('setupToken').value,nombre:byId('setupName').value,correo:byId('setupEmail').value,password:byId('setupPassword').value})});await cargarSesion();}catch(err){setAuthMessage(err.message);}});
+    byId('loginForm').addEventListener('submit',async e=>{e.preventDefault();setAuthMessage('');try{await request('/api/superadmin/login',{method:'POST',body:JSON.stringify({correo:byId('loginEmail').value,password:byId('loginPassword').value})});await cargarSesion();}catch(err){setAuthMessage(err.message);}});
+    async function cerrarSuperadmin(){await fetch('/api/superadmin/logout',{method:'POST'});window.location.reload();}
+    function cambiarVista(view) {
+      if(!allViews[view])return; currentView=view;
+      document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+      byId('viewTitle').textContent=allViews[view][0]; byId('viewSubtitle').textContent=allViews[view][1]; byId('tableTitle').textContent=allViews[view][2];
+      byId('teamsPanel').classList.toggle('hidden',view==='actividad'); byId('activityPanel').classList.toggle('hidden',view!=='actividad');
+      byId('statusFilter').classList.toggle('hidden',view==='actividad'); renderEquipos(); if(view==='actividad')renderActividad();
+    }
+    document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>cambiarVista(b.dataset.view)));
+    byId('searchTeams').addEventListener('input',renderEquipos); byId('statusFilter').addEventListener('change',renderEquipos);
+    async function actualizarEquipos(){try{const data=await request('/api/superadmin/equipos');equipos=data.equipos||[];window.lastAudit=data.auditoria||[];byId('statPending').textContent=data.pendientes??0;byId('statActive').textContent=data.activos??0;byId('statDue').textContent=data.por_vencer??0;byId('statWorkers').textContent=equipos.reduce((s,e)=>s+Number(e.cupos_ocupados||0),0);renderEquipos();if(currentView==='actividad')renderActividad();}catch(err){if(err.message.includes('Inicia sesión'))await cargarSesion();else mostrarToast(err.message,true);}}
+    function statusClass(status){return status==='activa'?'active':status==='declinada'?'denied':['vencida','suspendida'].includes(status)?'expired':'pending';}
+    function statusLabel(status){return ({activa:'Activa',pendiente:'Pendiente',solicitada:'Solicitud nueva',solicitada_ampliacion:'Ampliación solicitada',declinada:'Declinada',vencida:'Vencida',suspendida:'Suspendida',archivada:'Archivada'})[status]||status||'Pendiente';}
+    function filteredTeams(){const query=byId('searchTeams').value.trim().toLowerCase();const filter=byId('statusFilter').value;return equipos.filter(e=>{if(currentView==='solicitudes'&&!(['pendiente','declinada'].includes(e.estado)||String(e.solicitud_estado||'').startsWith('solicitada')))return false;if(currentView==='equipos'&&e.estado!=='activa')return false;if(currentView==='cuotas'&&e.estado==='declinada')return false;if(filter&&e.estado!==filter)return false;const hay=`${e.nombre} ${e.administrador?.nombre||''} ${e.administrador?.correo||''}`.toLowerCase();return !query||hay.includes(query);});}
+    function renderEquipos(){if(byId('teamsPanel').classList.contains('hidden'))return;const body=byId('teamsBody');const rows=filteredTeams();if(!rows.length){body.innerHTML='<tr><td colspan="7"><div class="empty"><span class="material-symbols-outlined">domain_disabled</span>No hay equipos para mostrar en esta sección.</div></td></tr>';return;}body.innerHTML=rows.map(e=>{const estado=e.solicitud_estado?.startsWith('solicitada')&&e.estado!=='activa'?'solicitada':e.estado;const fin=e.fecha_fin_suscripcion?new Date(`${e.fecha_fin_suscripcion}T12:00:00`).toLocaleDateString('es-MX'):'Sin definir';const precio=e.monto_ciclo_mxn==null?'Por cotizar':`$${Number(e.monto_ciclo_mxn).toLocaleString('es-MX',{minimumFractionDigits:2})} MXN · ${e.periodicidad==='anual'?'año':'mes'}`;const seats=`${e.cupos_ocupados||0} / ${e.cupos_limite||0}`;const code=e.codigo_equipo?`<span class="code">${escapeHtml(e.codigo_equipo)}<button class="code-copy" data-copy="${escapeHtml(e.codigo_equipo)}" title="Copiar código"><span class="material-symbols-outlined" style="font-size:15px">content_copy</span></button></span>`:'<span class="muted">Aún sin generar</span>';const requested=e.cupos_solicitados?`<div class="muted">Solicita ${e.cupos_solicitados} cupos</div>`:'';const isActive=e.estado==='activa';return `<tr><td><div class="company-name">${escapeHtml(e.nombre)}</div><div class="muted">${escapeHtml(e.administrador?.nombre||'Sin administrador')} · ${escapeHtml(e.administrador?.correo||'')}</div><div class="muted">Creado ${e.creado_en?new Date(e.creado_en).toLocaleDateString('es-MX'):'—'}</div></td><td><span class="pill ${statusClass(estado)}">${statusLabel(estado)}</span>${requested}</td><td><b>${escapeHtml(seats)}</b><div class="muted">personas</div></td><td><b>${escapeHtml(precio)}</b><div class="muted">Pagó $${Number(e.monto_pagado_mxn||0).toLocaleString('es-MX')} MXN</div></td><td>${escapeHtml(fin)}<div class="muted">${e.fecha_inicio_suscripcion?'Desde '+new Date(`${e.fecha_inicio_suscripcion}T12:00:00`).toLocaleDateString('es-MX'):'Sin activar'}</div></td><td>${code}</td><td><div class="actions">${!isActive?`<button class="primary-btn small-btn" data-action="activate" data-id="${e.id}">${e.estado==='declinada'?'Revisar':'Aprobar y crear código'}</button>`:`<button class="secondary-btn small-btn" data-action="activate" data-id="${e.id}">${e.solicitud_estado==='solicitada_ampliacion'?'Revisar ampliación':'Editar plan'}</button><button class="ghost-btn small-btn" data-action="payment" data-id="${e.id}">Registrar pago</button>`}${!isActive?`<button class="danger-btn small-btn" data-action="decline" data-id="${e.id}">Declinar</button>`:''}<button class="ghost-btn small-btn" data-action="archive" data-id="${e.id}" title="Archivar equipo">Archivar</button></div></td></tr>`}).join('');}
+    function renderActividad(){const box=byId('activityBody');const items=[];equipos.forEach(e=>{(e.pagos||[]).forEach(p=>items.push({date:p.registrado_en,title:`Pago registrado · ${e.nombre}`,body:`$${Number(p.monto_mxn||0).toLocaleString('es-MX')} MXN · ${p.nota||'Periodo actualizado'} · ${p.registrado_por||''}`,icon:'payments'}));});(window.lastAudit||[]).forEach(a=>items.push({date:a.creado_en,title:`${a.accion.replaceAll('_',' ')} · ${a.empresa_id?'equipo #'+a.empresa_id:'JJMClock'}`,body:`${a.superadmin_correo||'Superadmin'} · ${JSON.stringify(a.detalle||{})}`,icon:'manage_history'}));items.sort((a,b)=>String(b.date).localeCompare(String(a.date)));box.innerHTML=items.slice(0,80).map(i=>`<div class="audit-row"><div class="audit-dot"><span class="material-symbols-outlined">${i.icon}</span></div><div><strong>${escapeHtml(i.title)}</strong><p>${escapeHtml(i.body)}</p><time>${i.date?new Date(i.date).toLocaleString('es-MX'):'—'}</time></div></div>`).join('')||'<div class="empty">Aún no hay pagos ni movimientos registrados.</div>';}
+    function abrirModal(id){byId(id).classList.remove('hidden');}function cerrarModal(id){byId(id).classList.add('hidden');}
+    function fechaMesesDesde(fecha,meses){const d=new Date(`${fecha}T12:00:00`);const dia=d.getDate();d.setMonth(d.getMonth()+meses);if(d.getDate()<dia)d.setDate(0);return d.toLocaleDateString('sv-SE');}
+    function abrirActivacion(id){const e=equipos.find(x=>x.id===Number(id));if(!e)return;licenciaEmpresaId=e.id;byId('modalTitle').textContent=e.estado==='activa'?'Actualizar plan y cupos':'Aprobar equipo y crear código';byId('modalCompany').textContent=`${e.nombre} · ${e.administrador?.correo||'sin correo'}`;byId('licenseSeats').value=Math.max(Number(e.cupos_ocupados||0),Number(e.cupos_solicitados||e.cupos_limite||10),1);byId('licensePeriod').value=e.periodicidad||'mensual';byId('licensePaid').value='';byId('licenseRecurring').value=e.monto_ciclo_mxn??'';byId('licenseStart').value=e.fecha_inicio_suscripcion||hoyISO();byId('licenseEnd').value=e.fecha_fin_suscripcion||fechaMesesDesde(hoyISO(),byId('licensePeriod').value==='anual'?12:1);byId('licenseNote').value='';byId('saveLicense').textContent=e.estado==='activa'?'Guardar cambios':'Aprobar y generar código';abrirModal('licenseModal');}
+    byId('licensePeriod').addEventListener('change',()=>{if(!licenciaEmpresaId)return;byId('licenseEnd').value=fechaMesesDesde(byId('licenseStart').value||hoyISO(),byId('licensePeriod').value==='anual'?12:1);});
+    byId('licenseForm').addEventListener('submit',async e=>{e.preventDefault();const id=licenciaEmpresaId;try{const data=await request(`/api/superadmin/equipos/${id}/activar`,{method:'POST',body:JSON.stringify({cupos_limite:Number(byId('licenseSeats').value),monto_pagado_mxn:Number(byId('licensePaid').value||0),monto_ciclo_mxn:Number(byId('licenseRecurring').value||0),periodicidad:byId('licensePeriod').value,fecha_inicio_suscripcion:byId('licenseStart').value,fecha_fin_suscripcion:byId('licenseEnd').value,nota:byId('licenseNote').value})});cerrarModal('licenseModal');mostrarToast(`Equipo activo. Código: ${data.equipo.codigo_equipo}`);await actualizarEquipos();}catch(err){mostrarToast(err.message,true);}});
+    function abrirPago(id){const e=equipos.find(x=>x.id===Number(id));if(!e)return;pagoEmpresaId=e.id;byId('paymentCompany').textContent=`${e.nombre} · Vencimiento actual: ${e.fecha_fin_suscripcion||'sin definir'}`;byId('paymentAmount').value=e.monto_ciclo_mxn||'';byId('paymentEnd').value=fechaMesesDesde(e.fecha_fin_suscripcion&&e.fecha_fin_suscripcion>hoyISO()?e.fecha_fin_suscripcion:hoyISO(),e.periodicidad==='anual'?12:1);byId('paymentNote').value='';abrirModal('paymentModal');}
+    byId('paymentForm').addEventListener('submit',async e=>{e.preventDefault();try{await request(`/api/superadmin/equipos/${pagoEmpresaId}/pagos`,{method:'POST',body:JSON.stringify({monto_mxn:Number(byId('paymentAmount').value),fecha_fin_suscripcion:byId('paymentEnd').value,nota:byId('paymentNote').value})});cerrarModal('paymentModal');mostrarToast('Pago registrado y membresía renovada.');await actualizarEquipos();}catch(err){mostrarToast(err.message,true);}});
+    byId('teamsBody').addEventListener('click',async e=>{const copy=e.target.closest('[data-copy]');if(copy){try{await navigator.clipboard.writeText(copy.dataset.copy);mostrarToast('Código copiado.');}catch{mostrarToast('No se pudo copiar el código.',true);}return;}const button=e.target.closest('[data-action]');if(!button)return;const id=Number(button.dataset.id);if(button.dataset.action==='activate')abrirActivacion(id);if(button.dataset.action==='payment')abrirPago(id);if(button.dataset.action==='decline'){const motivo=prompt('Motivo de rechazo (opcional):','Solicitud no aprobada.');if(motivo===null)return;try{await request(`/api/superadmin/equipos/${id}/declinar`,{method:'POST',body:JSON.stringify({motivo})});mostrarToast('Solicitud declinada.');await actualizarEquipos();}catch(err){mostrarToast(err.message,true);}}if(button.dataset.action==='archive'){if(!confirm('Se archivará el equipo y se desactivará su código. El historial de asistencia y pagos se conservará. ¿Continuar?'))return;try{await request(`/api/superadmin/equipos/${id}`,{method:'DELETE'});mostrarToast('Equipo archivado; sus datos quedaron conservados.');await actualizarEquipos();}catch(err){mostrarToast(err.message,true);}}});
+    async function activarPushSuperadmin(){try{const result=await window.JJMNotificaciones.activar('superadmin');mostrarToast(result||'Avisos activados en este dispositivo.');}catch(err){mostrarToast(err.message,true);}}
+    window.addEventListener('click',e=>{if(e.target.classList.contains('modal-backdrop'))e.target.classList.add('hidden');});
+    cargarSesion();
+    window.setInterval(()=>{if(superadmin)actualizarEquipos();},60000);
+  </script>
+</body>
+</html>

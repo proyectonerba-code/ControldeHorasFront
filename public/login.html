@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <script src="/api-client.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#760009">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/jjmclock-192.png">
+  <title>JJMClock — Acceso</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+  <div class="app d-flex min-vh-100 flex-column">
+    <main class="flex-fill d-flex align-items-center justify-content-center py-4 px-3">
+      <section class="login-card shadow-sm" aria-labelledby="tituloLogin">
+        <div class="text-center mb-4">
+          <img src="/logo-jjm.jpg" alt="JJM Solutions" class="jjm-logo mb-2" style="width:60px; border-radius:8px;">
+          <div class="d-flex align-items-center justify-content-center gap-2">
+            <span class="text-danger fw-bold fs-4">JJM</span><span class="fw-bold text-dark">Clock</span>
+          </div>
+          <div class="text-muted small mt-1">Asistencia sencilla para tu equipo</div>
+        </div>
+
+        <h1 id="tituloLogin" class="h5 text-center mb-3">Bienvenido</h1>
+        <div id="msg" class="alert alert-danger d-none" role="alert" aria-live="polite"></div>
+
+        <div class="d-grid gap-2 mb-4" role="tablist" aria-label="Opciones de acceso">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-danger" id="tabLogin" aria-pressed="true" onclick="mostrarPanel('login')">Iniciar sesión</button>
+            <button type="button" class="btn btn-outline-danger" id="tabCrear" aria-pressed="false" onclick="mostrarPanel('crear')">Crear equipo</button>
+            <button type="button" class="btn btn-outline-secondary" id="tabUnir" aria-pressed="false" onclick="mostrarPanel('unir')">Unirme</button>
+          </div>
+        </div>
+
+        <form id="formLogin">
+          <p class="small text-muted">Ingresa con tu correo y contraseña.</p>
+          <div class="mb-2"><label class="form-label" for="correo">Correo</label><input id="correo" type="email" class="form-control" required autocomplete="username" placeholder="tu@correo.com"></div>
+          <div class="mb-3"><label class="form-label" for="password">Contraseña</label><input id="password" type="password" class="form-control" required autocomplete="current-password"></div>
+          <div id="loginCodigoBox" class="mb-3 d-none"><label class="form-label" for="codigoLogin">Código de equipo</label><input id="codigoLogin" class="form-control" autocomplete="organization" autocapitalize="characters" spellcheck="false"><div class="form-text">Solo hace falta si usas el mismo correo en varios equipos.</div></div>
+          <button type="submit" class="btn btn-dark w-100 py-2"><span class="material-icons-outlined me-1">login</span>Entrar</button>
+        </form>
+
+        <form id="formCrear" class="d-none">
+          <p class="small text-muted">Crea tu equipo y configura tus áreas. Para comenzar a invitar trabajadores, solicita la activación y el código según los cupos que necesites.</p>
+          <div class="mb-2"><label class="form-label" for="empresaNombre">Nombre del equipo o empresa</label><input id="empresaNombre" class="form-control" required autocomplete="organization"></div>
+          <div class="mb-2"><label class="form-label" for="empresaAdminNombre">Tu nombre</label><input id="empresaAdminNombre" class="form-control" required autocomplete="name"></div>
+          <div class="mb-2"><label class="form-label" for="empresaAdminCorreo">Tu correo</label><input id="empresaAdminCorreo" type="email" class="form-control" required autocomplete="email"></div>
+          <div class="mb-3"><label class="form-label" for="empresaAdminPassword">Crea una contraseña</label><input id="empresaAdminPassword" type="password" class="form-control" minlength="8" required autocomplete="new-password"><div class="form-text">Al menos 8 caracteres.</div></div>
+          <button type="submit" class="btn btn-danger w-100 py-2">Crear equipo y continuar</button>
+        </form>
+
+        <form id="formUnir" class="d-none">
+          <p class="small text-muted">Pide a tu administrador el código del equipo. Al unirte, entrarás directo a registrar asistencia.</p>
+          <div class="mb-2"><label class="form-label" for="equipoCodigo">Código de equipo</label><input id="equipoCodigo" class="form-control" required autocomplete="organization" autocapitalize="characters" spellcheck="false"></div>
+          <div class="mb-2"><label class="form-label" for="equipoNombre">Tu nombre</label><input id="equipoNombre" class="form-control" required autocomplete="name"></div>
+          <div class="mb-2"><label class="form-label" for="equipoCorreo">Tu correo</label><input id="equipoCorreo" type="email" class="form-control" required autocomplete="email"></div>
+          <div class="mb-3"><label class="form-label" for="equipoPassword">Crea una contraseña</label><input id="equipoPassword" type="password" class="form-control" minlength="8" required autocomplete="new-password"></div>
+          <button type="submit" class="btn btn-dark w-100 py-2">Unirme y registrar asistencia</button>
+        </form>
+
+        <div class="text-center mt-3">
+          <a href="/recuperar-equipo.html" class="small text-muted">¿Tienes datos de una versión anterior?</a>
+        </div>
+        <div class="text-center mt-2"><a href="/superadmin.html" class="small text-muted">Acceso de superadmin</a></div>
+      </section>
+    </main>
+    <footer class="text-center py-3 mt-auto"><small class="text-muted">JJMClock by JJM Solutions</small></footer>
+  </div>
+
+  <script>
+    const msg = document.getElementById('msg');
+    const formularios = { login: 'formLogin', crear: 'formCrear', unir: 'formUnir' };
+    const botones = { login: 'tabLogin', crear: 'tabCrear', unir: 'tabUnir' };
+
+    function mostrarPanel(nombre) {
+      Object.entries(formularios).forEach(([clave, id]) => {
+        document.getElementById(id).classList.toggle('d-none', clave !== nombre);
+        const boton = document.getElementById(botones[clave]);
+        boton.setAttribute('aria-pressed', clave === nombre ? 'true' : 'false');
+        boton.className = clave === nombre ? 'btn btn-danger' : 'btn btn-outline-secondary';
+      });
+      document.getElementById('tituloLogin').textContent = ({ login: 'Bienvenido', crear: 'Crea tu equipo', unir: 'Únete a tu equipo' })[nombre];
+      if (nombre !== 'login') {
+        document.getElementById('loginCodigoBox').classList.add('d-none');
+        document.getElementById('codigoLogin').value = '';
+      }
+      msg.classList.add('d-none');
+      msg.textContent = '';
+    }
+
+    function mostrarError(texto) {
+      msg.textContent = texto;
+      msg.className = 'alert alert-danger';
+    }
+
+    async function enviar(endpoint, datos) {
+      const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+      return res.json();
+    }
+
+    function irAlPanel(usuario) {
+      window.location.replace(usuario?.rol === 'admin' ? '/admin.html' : '/dashboard.html');
+    }
+
+    // Una sesión que siga activa lleva directo a la pantalla correspondiente.
+    (async () => {
+      try {
+        const res = await fetch('/api/perfil');
+        const data = await res.json();
+        if (data.ok && data.usuario) irAlPanel(data.usuario);
+      } catch (error) { /* El formulario sigue disponible si no hay sesión. */ }
+    })();
+
+    document.getElementById('formLogin').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const data = await enviar('/api/login', {
+          codigo_empresa: document.getElementById('codigoLogin').value.trim(),
+          correo: document.getElementById('correo').value,
+          password: document.getElementById('password').value
+        });
+        if (data.requiere_codigo) document.getElementById('loginCodigoBox').classList.remove('d-none');
+        if (!data.ok) return mostrarError(data.error || 'No se pudo iniciar sesión.');
+        irAlPanel(data.usuario);
+      } catch (error) { mostrarError('No se pudo conectar con el servidor.'); }
+    });
+
+    document.getElementById('formCrear').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const data = await enviar('/api/registro/empresa', {
+          empresa: document.getElementById('empresaNombre').value,
+          nombre: document.getElementById('empresaAdminNombre').value,
+          correo: document.getElementById('empresaAdminCorreo').value,
+          password: document.getElementById('empresaAdminPassword').value
+        });
+        if (!data.ok) return mostrarError(data.error || 'No se pudo crear el equipo.');
+        irAlPanel(data.usuario);
+      } catch (error) { mostrarError('No se pudo conectar con el servidor.'); }
+    });
+
+    document.getElementById('formUnir').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const data = await enviar('/api/registro/equipo', {
+          codigo_empresa: document.getElementById('equipoCodigo').value.trim(),
+          nombre: document.getElementById('equipoNombre').value,
+          correo: document.getElementById('equipoCorreo').value,
+          password: document.getElementById('equipoPassword').value
+        });
+        if (!data.ok) return mostrarError(data.error || 'No se pudo unir al equipo.');
+        irAlPanel(data.usuario);
+      } catch (error) { mostrarError('No se pudo conectar con el servidor.'); }
+    });
+  </script>
+</body>
+</html>

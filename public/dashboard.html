@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html class="h-full" lang="es">
+<head>
+  <script src="/api-client.js"></script>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <meta name="theme-color" content="#760009"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
+  <link rel="apple-touch-icon" href="/icons/jjmclock-192.png"/>
+  <title>JJMClock — Mi Asistencia</title>
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- Tailwind Configuration (JJMClock: blanco y rojo) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#dc2626',
+              redHover: '#b91c1c',
+              redLight: '#fee2e2',
+              redDark: '#7f1d1d'
+            }
+          },
+          boxShadow: {
+            'card-light': '0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04)',
+            'glow-red': '0 4px 14px 0 rgba(220, 38, 38, 0.35)'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Menlo', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <style data-purpose="custom-glow-effects">
+    .input-focus:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+    }
+    .clock-display {
+      letter-spacing: -0.04em;
+    }
+    .glow-red-box {
+      box-shadow: 0 4px 14px -2px rgba(220, 38, 38, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-[#f8fafc] text-[#0f172a] min-h-screen flex flex-col justify-center items-center p-3 sm:p-6 font-sans antialiased selection:bg-red-600 selection:text-white">
+
+  <!-- Toast de mensajes -->
+  <div id="msg" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-[90%] px-4 py-2.5 rounded-xl text-sm font-semibold shadow-card-light border"></div>
+
+  <!-- Pantalla de bloqueo por ubicación -->
+  <div id="ubicacionBloqueo" class="hidden w-full max-w-[390px] mb-4">
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center shadow-card-light">
+      <div class="mx-auto w-14 h-14 rounded-2xl bg-red-100 border border-red-200 flex items-center justify-center text-[#dc2626] mb-3.5 shadow-sm">
+        <span class="material-symbols-outlined text-2xl">location_off</span>
+      </div>
+      <h2 class="text-lg font-bold tracking-tight text-[#dc2626] uppercase mb-2">Activa tu ubicación</h2>
+      <p class="text-sm text-red-700 mb-4">
+        Para registrar tu asistencia debes estar dentro de la oficina y permitir que el navegador acceda a tu ubicación.
+      </p>
+      <button class="w-full py-2.5 px-4 rounded-xl bg-[#dc2626] hover:bg-[#b91c1c] text-white font-bold text-xs uppercase tracking-wider shadow-glow-red transition-all active:scale-[0.98]" onclick="solicitarUbicación()">
+        <span class="material-symbols-outlined me-1 text-[16px]">refresh</span>Intentar nuevamente
+      </button>
+      <p class="text-xs text-red-600 mt-3">
+        Si el problema persiste, contacta a tu administrador de RH.
+      </p>
+    </div>
+  </div>
+
+  <!-- Mobile Viewport Container (empleado) -->
+  <main class="w-full max-w-[390px] min-h-[600px] bg-[#f8fafc] border border-slate-200 rounded-2xl shadow-xl flex flex-col overflow-hidden relative">
+    <!-- Header con reloj -->
+    <header class="pt-6 pb-5 px-5 bg-white border-b border-slate-200/80" data-purpose="server-clock-header">
+      <div class="flex items-center justify-center mb-3">
+        <img src="/logo-jjm.jpg" alt="JJM Solutions" class="w-10 h-auto opacity-90 rounded-lg">
+      </div>
+      <div class="text-center">
+        <span class="text-[11px] font-bold tracking-[0.22em] text-slate-500 uppercase">Hora Oficial de Servidor</span>
+      </div>
+      <div class="mt-2 text-center">
+        <h1 class="text-6xl font-black tracking-tight text-[#dc2626] font-mono clock-display" id="live-clock">10:33:37</h1>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="p-4 space-y-4 flex-1 flex flex-col justify-between">
+      <!-- Identificación -->
+      <section data-purpose="worker-id-input-section">
+        <label class="block text-[11px] font-bold tracking-wider text-slate-500 uppercase mb-1.5" for="worker-id-input">Trabajador</label>
+        <div class="relative flex items-center">
+          <div class="absolute left-3 flex items-center pointer-events-none text-[#dc2626]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+          </div>
+          <input class="w-full bg-white border border-slate-200 focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] rounded-lg pl-11 pr-4 py-2.5 text-sm font-semibold text-slate-900 placeholder-slate-400 transition-all outline-none shadow-sm" id="worker-id-input" name="worker_id" placeholder="tu@correo.com" type="text" disabled/>
+        </div>
+      </section>
+
+      <!-- Marcaciones del turno -->
+      <section class="grid grid-cols-2 gap-2.5 pt-1" data-purpose="attendance-actions">
+        <button id="btnEntrada" class="py-4 px-3 rounded-xl bg-[#dc2626] hover:bg-[#b91c1c] text-white font-extrabold text-xs tracking-wider glow-red-box transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('entrada')" disabled>Marcar entrada</button>
+        <button id="btnSalidaComida" class="py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('comida_entrada')" disabled>Salir a comer</button>
+        <button id="btnRegresoComida" class="py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('comida_salida')" disabled>Regresar de comida</button>
+        <button id="btnSalida" class="py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('salida')" disabled>Marcar salida</button>
+      </section>
+      <p id="txtAyudaMarcacion" class="-mt-2 text-center text-[11px] leading-4 text-slate-500">Marca tu entrada para habilitar las demás opciones.</p>
+
+      <!-- Last Record Card -->
+      <section class="mt-2 bg-white border border-slate-200 rounded-xl p-3.5 space-y-2.5 shadow-sm" data-purpose="last-record-feedback">
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center gap-1.5 font-semibold text-emerald-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+            <span class="tracking-tight text-[11px] uppercase">Última Marcación Registrada</span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-medium tracking-tight" id="txtUltimaMarcacion">Hace un momento</span>
+        </div>
+        <div class="text-base font-bold text-slate-900 tracking-tight" id="txtNombreUsuario">
+          Cargando...
+        </div>
+        <div class="flex items-center justify-between pt-0.5 border-t border-slate-100 text-xs">
+          <div class="text-slate-500 font-medium">
+            Entrada Jornada: <span class="text-slate-800 font-semibold" id="txtEntradaHoy">—</span>
+          </div>
+          <span class="px-2 py-0.5 text-[10px] font-black tracking-wider uppercase bg-[#dcfce7] text-[#16a34a] border border-emerald-200 rounded" id="txtEstadoHoy">
+            Activo
+          </span>
+        </div>
+      </section>
+      <section class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm" aria-label="Notificaciones de asistencia">
+        <div class="flex items-center justify-between gap-3">
+          <div><div class="text-sm font-bold text-slate-800">Recordatorios de asistencia</div><p id="estadoPushTrabajador" class="text-[11px] leading-4 text-slate-500 mt-1">Activa los avisos para recordar tu salida y el regreso de comida.</p></div>
+          <button id="btnPushTrabajador" class="shrink-0 px-3 py-2 rounded-lg bg-slate-900 text-white text-[10px] font-bold uppercase tracking-wide" type="button" onclick="activarNotificacionesTrabajador()">Activar</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <button class="mt-3 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-[#dc2626]" type="button" onclick="cerrarSesion()">Cerrar sesión</button>
+
+  <!-- Interactive Clock Script -->
+  <script data-purpose="live-clock">
+    function updateClock() {
+      const clockElement = document.getElementById('live-clock');
+      if (!clockElement) return;
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+
+  <script src="/push-client.js"></script>
+  <script>
+    let ubicacionValida = false;
+    let ubicacionActual = { lat: null, lng: null };
+    let registroDiaActual = null;
+    let diaServidorSemana = null;
+    let esAdmin = false;
+
+    async function init() {
+      const res = await fetch('/api/perfil');
+      const data = await res.json();
+      if (!data.ok) { window.location.href = '/login.html'; return; }
+
+      const u = data.usuario;
+      esAdmin = u.rol === 'admin';
+      document.getElementById('txtNombreUsuario').textContent = esAdmin ? (u.nombre + ' · Administrador') : u.nombre;
+      const elUsuario = document.getElementById('txtUsuario');
+      if (elUsuario) elUsuario.textContent = u.correo;
+      document.getElementById('worker-id-input').value = u.correo;
+
+      await cargarEstadoDia();
+      await solicitarUbicación();
+    }
+
+    async function cargarEstadoDia() {
+      try {
+        const res = await fetch('/api/asistencia/hoy');
+        if (res.ok && (res.headers.get('content-type') || '').includes('application/json')) {
+          const data = await res.json();
+          if (data.ok) {
+            mostrarEstadoDia(data.registro || null, Number(data.dia_semana));
+            return;
+          }
+        }
+      } catch (e) {
+        // Un servidor anterior puede no tener todavía el endpoint de consulta diaria.
+      }
+
+      try {
+        const fechaHoy = fechaLocalISO(new Date());
+        const res = await fetch('/api/asistencia/semana?fecha=' + encodeURIComponent(fechaHoy));
+        const data = await res.json();
+        if (!data.ok) return;
+
+        const registro = (data.dias || []).find(d => d.fecha === fechaHoy) || null;
+        const fechaPartes = fechaHoy.split('-').map(Number);
+        const diaSemana = registro?.dia_semana ?? new Date(fechaPartes[0], fechaPartes[1] - 1, fechaPartes[2], 12).getDay();
+        mostrarEstadoDia(registro, diaSemana);
+      } catch (e) {
+        console.error('estado dia', e);
+      }
+    }
+
+    function fechaLocalISO(fecha) {
+      return new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Mexico_City', year:'numeric', month:'2-digit', day:'2-digit' }).format(fecha);
+    }
+
+    function mostrarEstadoDia(registro, diaSemana) {
+      registroDiaActual = registro;
+      diaServidorSemana = diaSemana;
+      const elEntrada = document.getElementById('txtEntradaHoy');
+      const elEstado = document.getElementById('txtEstadoHoy');
+      if (elEntrada) elEntrada.textContent = registroDiaActual?.entrada || '—';
+      if (elEstado) elEstado.textContent = registroDiaActual?.estado || 'Sin registro';
+      actualizarBotones();
+    }
+
+    function actualizarBotones() {
+      const entrada = Boolean(registroDiaActual?.entrada);
+      const salida = Boolean(registroDiaActual?.salida);
+      const comidaIniciada = Boolean(registroDiaActual?.comida_entrada);
+      const regresoComida = Boolean(registroDiaActual?.comida_salida);
+      const diaSemana = registroDiaActual?.dia_semana ?? diaServidorSemana;
+      const domingoRestringido = Number(diaSemana) === 0 && !esAdmin;
+      document.getElementById('btnEntrada').disabled = !ubicacionValida || entrada;
+      document.getElementById('btnSalidaComida').disabled = !ubicacionValida || domingoRestringido || !entrada || comidaIniciada || salida;
+      document.getElementById('btnRegresoComida').disabled = !ubicacionValida || domingoRestringido || !comidaIniciada || regresoComida || salida;
+      document.getElementById('btnSalida').disabled = !ubicacionValida || domingoRestringido || !entrada || salida;
+      const ayuda = document.getElementById('txtAyudaMarcacion');
+      if (ayuda) {
+        ayuda.textContent = domingoRestringido && entrada
+          ? 'La marcación de domingo queda como incidencia y no habilita comida ni salida.'
+          : salida
+            ? 'La jornada de hoy ya está cerrada.'
+            : !entrada
+              ? 'Marca tu entrada para habilitar las opciones de comida y salida.'
+              : comidaIniciada && !regresoComida
+                ? 'Marca tu regreso de comida antes de cerrar la jornada.'
+                : 'Marca la comida si aplica; registra tu salida al terminar.';
+      }
+    }
+
+    function toast(texto, tipo) {
+      const msg = document.getElementById('msg');
+      if (!msg) return;
+      msg.textContent = texto;
+      msg.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-[90%] px-4 py-2.5 rounded-xl text-sm font-semibold shadow-card-light border ' +
+        (tipo === 'error'
+          ? 'bg-red-50 text-red-800 border-red-200'
+          : 'bg-emerald-50 text-emerald-800 border-emerald-200');
+      msg.classList.remove('hidden');
+      clearTimeout(msg._t);
+      msg._t = setTimeout(() => msg.classList.add('hidden'), 4000);
+    }
+
+    async function marcar(tipo) {
+      if (!ubicacionValida) {
+        toast('Debes activar tu ubicación y estar dentro de la oficina para registrar asistencia.', 'error');
+        return;
+      }
+
+      toast('Procesando...', 'ok');
+      try {
+        const res = await fetch('/api/asistencia/marcar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tipo, lat: ubicacionActual.lat, lng: ubicacionActual.lng })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          toast(data.mensaje || 'Registro guardado.', 'ok');
+          await cargarEstadoDia();
+        } else {
+          toast(data.error || 'Error al marcar.', 'error');
+          await cargarEstadoDia();
+        }
+      } catch (err) {
+        toast('No se pudo conectar con el servidor.', 'error');
+      }
+    }
+
+    async function solicitarUbicación() {
+      const bloqueo = document.getElementById('ubicacionBloqueo');
+
+      // El administrador puede marcar desde cualquier lugar:
+      // no se le exige estar dentro del radio de la oficina.
+      if (esAdmin) {
+        ubicacionValida = true;
+        if (bloqueo) bloqueo.classList.add('hidden');
+        actualizarBotones();
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/config/oficina');
+        const data = await res.json();
+        if (!data.ok) throw new Error('No se pudo obtener la configuración de la oficina');
+
+        const oficina = data.oficina;
+
+        if (!oficina) {
+          ubicacionValida = true;
+          if (bloqueo) bloqueo.classList.add('hidden');
+          actualizarBotones();
+          return;
+        }
+
+        const pos = await new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error('Geolocalización no soportada'));
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          });
+        });
+
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        ubicacionActual = { lat, lng };
+
+        const R = 6371000;
+        const rad = Math.PI / 180;
+        const dLat = (oficina.lat - lat) * rad;
+        const dLng = (oficina.lng - lng) * rad;
+        const a = Math.sin(dLat / 2) ** 2 +
+          Math.cos(lat * rad) * Math.cos(oficina.lat * rad) *
+          Math.sin(dLng / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distancia = R * c;
+
+        if (distancia <= oficina.radioMetros) {
+          ubicacionValida = true;
+          if (bloqueo) bloqueo.classList.add('hidden');
+          actualizarBotones();
+        } else {
+          ubicacionValida = false;
+          if (bloqueo) bloqueo.classList.remove('hidden');
+          actualizarBotones();
+          toast(`Estás a ${Math.round(distancia)} m de la oficina. Debes estar dentro de ${oficina.radioMetros} m para marcar.`, 'error');
+        }
+      } catch (err) {
+        ubicacionValida = false;
+        if (bloqueo) bloqueo.classList.remove('hidden');
+        actualizarBotones();
+        console.error('Error geolocalización:', err);
+      }
+    }
+
+    async function cerrarSesion() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.replace('/login.html');
+    }
+
+    async function activarNotificacionesTrabajador() {
+      const estado = document.getElementById('estadoPushTrabajador');
+      try {
+        estado.textContent = await window.JJMNotificaciones.activar('usuario');
+      } catch (error) { estado.textContent = error.message; }
+    }
+
+    init();
+  </script>
+</body>
+</html>
