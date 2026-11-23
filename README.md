@@ -8,8 +8,9 @@ Sirve `public/` en `http://localhost:5500` y arranca `jjmclock-backend` en el pu
 
 ## Publicación en Cloudflare Pages
 
-- Directorio raíz del proyecto: `public`
-- Comando de compilación: ninguno
+- Framework preset: ninguno
+- Directorio raíz del proyecto: repo raíz (`.`)
+- Comando de compilación: `exit 0`
 - Directorio de salida: `public`
 - Dominio propuesto: `asistencia.gruponerba.com`
 - API propuesta: `https://api.gruponerba.com`
