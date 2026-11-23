@@ -3,11 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0;url=/login.html">
   <title>JJM Clock</title>
-  <script>window.location.replace('/login.html');</script>
+  <script>
+    const destino = window.location.hostname === 'controldehorasfront.pages.dev'
+      ? 'https://asistencia.gruponerba.com/login.html'
+      : '/login.html';
+    window.location.replace(destino);
+  </script>
 </head>
 <body>
-  <p>Abriendo JJM Clock… <a href="/login.html">Continuar</a></p>
+  <p>Abriendo JJM Clock… <a href="https://asistencia.gruponerba.com/login.html">Continuar</a></p>
 </body>
 </html>
