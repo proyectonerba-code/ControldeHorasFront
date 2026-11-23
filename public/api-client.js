@@ -1,8 +1,8 @@
-/* API separada en api.gruponerba.com; ajusta el dominio al configurar el despliegue. */
+/* API de JJM Clock desplegada en Render. */
 (function () {
   const host = window.location.hostname;
   const esLocal = host === 'localhost' || host === '127.0.0.1';
-  const apiBase = String(window.JJM_API_BASE || (esLocal ? 'http://localhost:3000' : 'https://api.gruponerba.com'))
+  const apiBase = String(window.JJM_API_BASE || (esLocal ? 'http://localhost:3000' : 'https://asistencia-api.gruponerba.com'))
     .replace(/\/+$/, '');
 
   function apiUrl(path) {
