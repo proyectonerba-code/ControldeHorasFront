@@ -120,7 +120,19 @@
     .shadow-card { box-shadow: none; border: 1px solid #dce4f5; }
     .rounded-none { border-radius: 0 !important; }
     .admin-shell{min-height:100vh;display:grid;grid-template-columns:248px minmax(0,1fr);}
-    .admin-sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;background:#fff;border-right:1px solid #dce4f5;padding:20px 14px;z-index:30;}
+    .admin-sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;background:#fff;border-right:1px solid #dce4f5;padding:20px 14px;z-index:30;transition:width .22s ease;}
+    .admin-sidebar.collapsed{width:64px;overflow-x:hidden;}
+    .admin-sidebar.collapsed .sidebar-brand-title,
+    .admin-sidebar.collapsed .sidebar-brand-subtitle,
+    .admin-sidebar.collapsed .sidebar-team,
+    .admin-sidebar.collapsed .admin-nav-group-label,
+    .admin-sidebar.collapsed .admin-nav-link span,
+    .admin-sidebar.collapsed .sidebar-footer{display:none;}
+    .admin-sidebar.collapsed .admin-nav-link{justify-content:center;padding:9px 6px;}
+    .admin-sidebar.collapsed .admin-nav-link .material-symbols-outlined{font-size:20px;}
+    .admin-shell.sidebar-collapsed{grid-template-columns:64px minmax(0,1fr);}
+    .admin-toggle-sidebar{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid #dce4f5;background:#fff;color:#364158;border-radius:6px;cursor:pointer;margin-right:10px;transition:background .15s,color .15s;}
+    .admin-toggle-sidebar:hover{background:#eff4ff;color:#760009;}
     .sidebar-brand{display:flex;align-items:center;gap:11px;padding:0 7px 20px;border-bottom:1px solid #e1e8f5;}
     .sidebar-brand-mark{width:38px;height:38px;display:grid;place-items:center;background:#fff;border:1px solid #e1e8f5;overflow:hidden;}
     .sidebar-brand-mark img{width:100%;height:100%;object-fit:contain;}
@@ -339,6 +351,9 @@
 
     <div class="admin-workspace">
       <header class="admin-topbar">
+        <button class="admin-toggle-sidebar" type="button" onclick="toggleSidebar()" aria-label="Ocultar menú lateral" aria-pressed="false">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
         <div>
           <p class="admin-page-kicker">JJMClock · Administración</p>
           <h1 class="admin-page-title" id="adminPageTitle">Asistencias del día</h1>
@@ -1169,6 +1184,18 @@
         if (vistaAdminActual === 'asistencia') cargarAsistenciasDia();
         else if (vistaAdminActual === 'resumen') { cargarResumen(); cargarSuscripcionEquipo(); }
       }, 60000);
+
+      if (localStorage.getItem('jjm_sidebar_collapsed') === '1') {
+        const sidebar = document.querySelector('.admin-sidebar');
+        const shell = document.querySelector('.admin-shell');
+        const btn = document.querySelector('.admin-toggle-sidebar');
+        const icon = btn.querySelector('.material-symbols-outlined');
+        sidebar.classList.add('collapsed');
+        shell.classList.add('sidebar-collapsed');
+        btn.setAttribute('aria-pressed', 'true');
+        btn.setAttribute('aria-label', 'Mostrar menú lateral');
+        icon.textContent = 'chevron_right';
+      }
     }
 
     async function cargarResumen() {
@@ -1481,6 +1508,19 @@
     async function cerrarSesion() {
       await fetch('/api/logout', { method: 'POST' });
       window.location.href = '/login.html';
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.admin-sidebar');
+      const shell = document.querySelector('.admin-shell');
+      const btn = document.querySelector('.admin-toggle-sidebar');
+      const icon = btn.querySelector('.material-symbols-outlined');
+      const col = sidebar.classList.toggle('collapsed');
+      shell.classList.toggle('sidebar-collapsed', col);
+      btn.setAttribute('aria-pressed', String(col));
+      btn.setAttribute('aria-label', col ? 'Mostrar menú lateral' : 'Ocultar menú lateral');
+      icon.textContent = col ? 'chevron_right' : 'chevron_left';
+      localStorage.setItem('jjm_sidebar_collapsed', col ? '1' : '0');
     }
 
     function cambiarVistaAdmin(id) {
