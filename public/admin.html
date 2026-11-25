@@ -119,34 +119,8 @@
     .shadow-hard { box-shadow: 4px 4px 0px 0px #0f172a; }
     .shadow-card { box-shadow: none; border: 1px solid #dce4f5; }
     .rounded-none { border-radius: 0 !important; }
-    .admin-shell{min-height:100vh;display:grid;grid-template-columns:260px minmax(0,1fr);transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1);}
-    .admin-sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;background:#fff;border-right:1px solid #e2e8f0;padding:24px 16px 32px;z-index:30;transition:width .28s cubic-bezier(.4,0,.2,1),box-shadow .28s ease;}
-    .admin-sidebar.collapsed{width:80px;overflow-x:hidden;padding:24px 10px 32px;border-right:0;box-shadow:2px 0 12px rgba(0,0,0,.08);}
-    .admin-sidebar.collapsed .sidebar-brand{justify-content:center;padding:0 6px 28px;border-bottom:0;}
-    .admin-sidebar.collapsed .sidebar-brand-mark{width:42px;height:42px;margin:0 auto;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;}
-    .admin-sidebar.collapsed .sidebar-brand-title,
-    .admin-sidebar.collapsed .sidebar-brand-subtitle,
-    .admin-sidebar.collapsed .sidebar-team,
-    .admin-sidebar.collapsed .admin-nav-group-label,
-    .admin-sidebar.collapsed .admin-nav-link span,
-    .admin-sidebar.collapsed .sidebar-footer{display:none;}
-    .admin-sidebar.collapsed .admin-side-nav{align-items:center;gap:10px;}
-    .admin-sidebar.collapsed .admin-nav-link{justify-content:center;padding:14px 8px;width:auto;min-width:56px;border-radius:14px;position:relative;display:flex;flex-direction:column;align-items:center;}
-    .admin-sidebar.collapsed .admin-nav-link .material-symbols-outlined{font-size:26px;color:#334155;transition:all .2s ease;width:100%;height:100%;display:grid;place-items:center;}
-    .admin-sidebar.collapsed .admin-nav-link:hover{background:#760009;}
-    .admin-sidebar.collapsed .admin-nav-link:hover .material-symbols-outlined{color:#fff;}
-    .admin-sidebar.collapsed .admin-nav-link:active{background:#5a0000;transform:scale(.95);}
-    .admin-sidebar.collapsed .admin-nav-link.is-active{background:#760009;color:#fff;border-left:0;box-shadow:0 2px 8px rgba(118,0,9,.2);position:relative;}
-    .admin-sidebar.collapsed .admin-nav-link.is-active .material-symbols-outlined{color:#ffb4ac;}
-    .admin-sidebar.collapsed .admin-nav-link.is-active::before{content:'';position:absolute;inset:0;border-radius:14px;background:rgba(255,255,255,.12);z-index:0;}
-    .admin-sidebar.collapsed .admin-nav-link.is-active .material-symbols-outlined{position:relative;z-index:1;}
-    .admin-sidebar.collapsed .admin-nav-link::after{content:attr(title);position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:10px;background:#0b1c30;color:#fff;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;font-family:'Geist',sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.15);}
-    .admin-sidebar.collapsed .admin-nav-link:hover::after{opacity:1;}
-    .admin-shell.sidebar-collapsed{grid-template-columns:80px minmax(0,1fr);}
-    .admin-toggle-sidebar{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid #e2e8f0;background:#fff;color:#334155;border-radius:14px;cursor:pointer;margin-right:16px;transition:all .2s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 10px rgba(0,0,0,.08);font-size:20px;}
-    .admin-toggle-sidebar .material-symbols-outlined{font-size:20px;}
-    .admin-toggle-sidebar:hover{background:#760009;color:#fff;border-color:#760009;box-shadow:0 6px 16px rgba(118,0,9,.2);transform:translateY(-2px);}
-    .admin-toggle-sidebar[aria-pressed="true"]{background:#760009;color:#fff;border-color:#760009;}
+    .admin-shell{min-height:100vh;display:grid;grid-template-columns:260px minmax(0,1fr);}
+    .admin-sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;background:#fff;border-right:1px solid #e2e8f0;padding:24px 16px 32px;z-index:30;}
     .sidebar-brand{display:flex;align-items:center;gap:12px;padding:0 8px 28px;border-bottom:1px solid #eef2f7;}
     .sidebar-brand{display:flex;align-items:center;gap:11px;padding:0 7px 20px;border-bottom:1px solid #e1e8f5;}
     .sidebar-brand-mark{width:38px;height:38px;display:grid;place-items:center;background:#fff;border:1px solid #e1e8f5;overflow:hidden;}
@@ -366,9 +340,6 @@
 
     <div class="admin-workspace">
       <header class="admin-topbar">
-        <button class="admin-toggle-sidebar" type="button" onclick="toggleSidebar()" aria-label="Ocultar menú lateral" aria-pressed="false">
-          <span class="material-symbols-outlined">chevron_left</span>
-        </button>
         <div>
           <p class="admin-page-kicker">JJMClock · Administración</p>
           <h1 class="admin-page-title" id="adminPageTitle">Asistencias del día</h1>
@@ -1199,18 +1170,6 @@
         if (vistaAdminActual === 'asistencia') cargarAsistenciasDia();
         else if (vistaAdminActual === 'resumen') { cargarResumen(); cargarSuscripcionEquipo(); }
       }, 60000);
-
-      if (localStorage.getItem('jjm_sidebar_collapsed') === '1') {
-        const sidebar = document.querySelector('.admin-sidebar');
-        const shell = document.querySelector('.admin-shell');
-        const btn = document.querySelector('.admin-toggle-sidebar');
-        const icon = btn.querySelector('.material-symbols-outlined');
-        sidebar.classList.add('collapsed');
-        shell.classList.add('sidebar-collapsed');
-        btn.setAttribute('aria-pressed', 'true');
-        btn.setAttribute('aria-label', 'Mostrar menú lateral');
-        icon.textContent = 'chevron_right';
-      }
     }
 
     async function cargarResumen() {
@@ -1523,19 +1482,6 @@
     async function cerrarSesion() {
       await fetch('/api/logout', { method: 'POST' });
       window.location.href = '/login.html';
-    }
-
-    function toggleSidebar() {
-      const sidebar = document.querySelector('.admin-sidebar');
-      const shell = document.querySelector('.admin-shell');
-      const btn = document.querySelector('.admin-toggle-sidebar');
-      const icon = btn.querySelector('.material-symbols-outlined');
-      const col = sidebar.classList.toggle('collapsed');
-      shell.classList.toggle('sidebar-collapsed', col);
-      btn.setAttribute('aria-pressed', String(col));
-      btn.setAttribute('aria-label', col ? 'Mostrar menú lateral' : 'Ocultar menú lateral');
-      icon.textContent = col ? 'chevron_right' : 'chevron_left';
-      localStorage.setItem('jjm_sidebar_collapsed', col ? '1' : '0');
     }
 
     function cambiarVistaAdmin(id) {
