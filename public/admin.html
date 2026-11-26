@@ -853,9 +853,9 @@
           <div class="bg-surface-container-lowest shadow-card overflow-hidden mt-3">
             <div class="p-3 border-b border-outline-variant">
               <h3 class="font-title-sm text-title-sm text-on-surface uppercase">
-                <span class="material-symbols-outlined me-2 text-primary">flight_takeoff</span>Solicitudes de vacaciones
+                <span class="material-symbols-outlined me-2 text-primary">flight_takeoff</span>Bitácora de vacaciones
               </h3>
-              <p class="font-body-sm text-body-sm text-secondary mt-1">Registro y revisión manual conforme a la política de la empresa.</p>
+              <p class="font-body-sm text-body-sm text-secondary mt-1">Control de días de descanso. Aprobar descuenta días del periodo; rechazar los conserva.</p>
             </div>
             <form id="formVacaciones" class="p-3 grid grid-cols-1 md:grid-cols-6 gap-2 border-b border-outline-variant">
               <select id="vacacionesCorreo" class="md:col-span-2 px-2 py-1.5 bg-surface-container-low text-on-surface border border-outline-variant" required>
@@ -865,7 +865,7 @@
               <input type="date" id="vacacionesFechaFin" class="px-2 py-1.5 bg-surface-container-low text-on-surface border border-outline-variant" required aria-label="Fecha final">
               <input type="number" id="vacacionesDias" class="px-2 py-1.5 bg-surface-container-low text-on-surface border border-outline-variant" min="1" max="365" placeholder="Días" required aria-label="Días solicitados">
               <input type="text" id="vacacionesMotivo" class="md:col-span-4 px-2 py-1.5 bg-surface-container-low text-on-surface border border-outline-variant" maxlength="300" placeholder="Motivo (opcional)" aria-label="Motivo">
-              <button type="submit" class="md:col-span-2 px-3 py-1.5 bg-primary text-on-primary font-label-technical text-label-technical uppercase">Registrar solicitud</button>
+              <button type="submit" class="md:col-span-2 px-3 py-1.5 bg-primary text-on-primary font-label-technical text-label-technical uppercase">Registrar en bitácora</button>
             </form>
             <div class="overflow-x-auto">
               <table class="admin-data-table">
@@ -875,8 +875,10 @@
                     <th class="px-3 py-2.5 font-label-technical text-label-technical uppercase tracking-wider">Desde</th>
                     <th class="px-3 py-2.5 font-label-technical text-label-technical uppercase tracking-wider">Hasta</th>
                     <th class="px-3 py-2.5 font-label-technical text-label-technical uppercase tracking-wider">Días</th>
+                    <th class="px-3 py-2.5 font-label-technical text-label-technical uppercase tracking-wider">Restantes</th>
                     <th class="px-3 py-2.5 font-label-technical text-label-technical uppercase tracking-wider">Estado</th>
                     <th class="px-3 py-2.5 font-label-technical text-label-technical uppercase tracking-wider">Motivo</th>
+                    <th class="px-3 py-2.5 font-label-technical text-label-technical uppercase tracking-wider text-right">Acción</th>
                   </tr>
                 </thead>
                 <tbody id="tbodyVacaciones" class="divide-y divide-outline-variant"></tbody>
@@ -2410,19 +2412,29 @@
       data.solicitudes.forEach(v => {
         const tr = document.createElement('tr');
         const estadoActual = ['pendiente', 'aprobada', 'rechazada'].includes(v.estado) ? v.estado : 'pendiente';
+        const restante = v.dias_restantes !== null && v.dias_restantes !== undefined
+          ? `<span class="font-bold ${v.dias_restantes === 0 ? 'text-red-700' : 'text-emerald-700'}">${v.dias_restantes} día(s)</span>`
+          : '<span class="text-secondary">Sin periodo</span>';
+        const badge = estadoActual === 'aprobada' ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">Aprobada</span>'
+          : estadoActual === 'rechazada' ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">Rechazada</span>'
+          : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">Pendiente</span>';
         tr.innerHTML = `
           <td>${escaparHTML(v.nombre)}</td>
           <td>${escaparHTML(v.fecha_ini)}</td>
           <td>${escaparHTML(v.fecha_fin)}</td>
           <td>${v.dias_solicitados}</td>
-          <td><select class="form-select form-select-sm js-estado-vacaciones" aria-label="Estado de vacaciones">
-            <option value="pendiente" ${estadoActual === 'pendiente' ? 'selected' : ''}>Pendiente</option>
-            <option value="aprobada" ${estadoActual === 'aprobada' ? 'selected' : ''}>Aprobada</option>
-            <option value="rechazada" ${estadoActual === 'rechazada' ? 'selected' : ''}>Rechazada</option>
-          </select></td>
+          <td>${restante}</td>
+          <td>${badge}</td>
           <td>${escaparHTML(v.motivo || '—')}</td>
+          <td class="text-right whitespace-nowrap">
+            <button class="icon-action js-aprobar-vac" type="button" title="Aprobar" ${estadoActual === 'aprobada' ? 'disabled' : ''}><span class="material-symbols-outlined">check_circle</span></button>
+            <button class="icon-action js-rechazar-vac" type="button" title="Rechazar" ${estadoActual === 'rechazada' ? 'disabled' : ''}><span class="material-symbols-outlined">cancel</span></button>
+            <button class="icon-action js-eliminar-vac" type="button" title="Eliminar registro"><span class="material-symbols-outlined">delete</span></button>
+          </td>
         </tr>`;
-        tr.querySelector('.js-estado-vacaciones').addEventListener('change', (e) => actualizarEstadoVacaciones(v.id, e.target.value));
+        tr.querySelector('.js-aprobar-vac').addEventListener('click', () => actualizarEstadoVacaciones(v.id, 'aprobada'));
+        tr.querySelector('.js-rechazar-vac').addEventListener('click', () => actualizarEstadoVacaciones(v.id, 'rechazada'));
+        tr.querySelector('.js-eliminar-vac').addEventListener('click', () => eliminarVacacion(v.id));
         tbody.appendChild(tr);
       });
     }
@@ -2442,7 +2454,7 @@
       const data = await res.json();
       if (!data.ok) return mostrarMsg(data.error || 'No se pudo registrar la solicitud.');
       e.target.reset();
-      mostrarMsg('Solicitud de vacaciones registrada.', 'ok');
+      mostrarMsg('Registro de vacaciones agregado a la bitácora.', 'ok');
       cargarVacaciones();
     });
 
@@ -2451,7 +2463,21 @@
         method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ estado })
       });
       const data = await res.json();
-      if (!data.ok) { mostrarMsg(data.error || 'No se pudo actualizar el estado.'); cargarVacaciones(); }
+      if (!data.ok) {
+        mostrarMsg(data.error || 'No se pudo actualizar el estado.');
+      } else {
+        mostrarMsg(estado === 'aprobada' ? 'Vacación aprobada: días descontados del periodo.' : 'Vacación rechazada: días conservados.', 'ok');
+      }
+      cargarVacaciones();
+    }
+
+    async function eliminarVacacion(id) {
+      if (!confirm('¿Eliminar este registro de la bitácora de vacaciones?')) return;
+      const res = await fetch(`/api/admin/vacaciones/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!data.ok) { mostrarMsg(data.error || 'No se pudo eliminar.'); return; }
+      mostrarMsg('Registro eliminado.', 'ok');
+      cargarVacaciones();
     }
 
     // ---------- Notificaciones ----------
@@ -2537,10 +2563,25 @@
       window.location.href = window.JJMApi.url('/api/admin/exportar/usuarios');
     }
 
-    function exportarReporteSemanal() {
+    async function exportarReporteSemanal() {
       const fecha = document.getElementById('fechaExportar').value;
-      const url = fecha ? '/api/admin/exportar/reporte?fecha=' + fecha : '/api/admin/exportar/reporte';
-      window.location.href = url;
+      const url = window.JJMApi.url(fecha ? '/api/admin/exportar/reporte?fecha=' + fecha : '/api/admin/exportar/reporte');
+      try {
+        const res = await fetch(url, { credentials: 'include' });
+        if (!res.ok) throw new Error('No se pudo generar el reporte.');
+        const blob = await res.blob();
+        const nombre = (res.headers.get('content-disposition') || '').match(/filename="?([^";]+)"?/)?.[1] || `reporte_semanal_${fecha || 'actual'}.xlsx`;
+        const enlace = document.createElement('a');
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = nombre;
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+        setTimeout(() => URL.revokeObjectURL(enlace.href), 1000);
+        mostrarMsg('Reporte semanal descargado.', 'ok');
+      } catch (err) {
+        mostrarMsg(err.message || 'No se pudo descargar el reporte.');
+      }
     }
 
     function exportarAsistenciaUsuario() {
