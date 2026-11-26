@@ -7,6 +7,8 @@
   <meta name="theme-color" content="#760009"/>
   <link rel="manifest" href="/manifest.webmanifest"/>
   <link rel="apple-touch-icon" href="/icons/jjmclock-192.png"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>JJMClock — Mi Asistencia</title>
   <!-- Tailwind CSS v3 CDN -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -211,6 +213,7 @@
       await solicitarUbicación();
       await cargarAvisos();
       window.setInterval(cargarAvisos, 8000);
+      actualizarEstadoPushTrabajador();
     }
 
     async function cargarAvisos() {
@@ -437,10 +440,35 @@
       window.location.replace('/login.html');
     }
 
+    async function actualizarEstadoPushTrabajador() {
+      const estado = document.getElementById('estadoPushTrabajador');
+      const boton = document.getElementById('btnPushTrabajador');
+      if (!estado || !window.JJMNotificaciones) return;
+      if (!window.JJMNotificaciones.disponible()) {
+        estado.textContent = 'Este navegador no admite notificaciones push. Usa Chrome o Safari desde HTTPS.';
+        return;
+      }
+      const e = await window.JJMNotificaciones.estado('usuario');
+      if (e.suscrito) {
+        estado.textContent = '✅ Activos en este dispositivo. Recibirás avisos aunque cierres la página.';
+        if (boton) boton.textContent = 'Desactivar';
+      } else if (e.permiso === 'denied') {
+        estado.textContent = 'Notificaciones bloqueadas. Permítelas en Ajustes del sitio (ícono de candado).';
+      }
+    }
+
     async function activarNotificacionesTrabajador() {
       const estado = document.getElementById('estadoPushTrabajador');
+      const boton = document.getElementById('btnPushTrabajador');
       try {
+        const actual = await window.JJMNotificaciones.estado('usuario');
+        if (actual.suscrito && boton?.textContent.includes('Desactivar')) {
+          estado.textContent = await window.JJMNotificaciones.desactivar('usuario');
+          if (boton) boton.textContent = 'Activar';
+          return;
+        }
         estado.textContent = await window.JJMNotificaciones.activar('usuario');
+        if (boton) boton.textContent = 'Desactivar';
       } catch (error) { estado.textContent = error.message; }
     }
 

@@ -5,8 +5,8 @@ self.addEventListener('push', event => {
   const title = data.title || 'Aviso de JJMClock';
   const options = {
     body: data.body || 'Tienes una actualización de tu equipo.',
-    icon: '/logo-jjm.jpg',
-    badge: '/logo-jjm.jpg',
+    icon: '/icons/jjmclock-192.png',
+    badge: '/icons/jjmclock-192.png',
     tag: data.tag || 'jjmclock-aviso',
     renotify: false,
     data: { url: data.url || '/' }

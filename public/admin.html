@@ -7,6 +7,8 @@
   <meta name="theme-color" content="#760009"/>
   <link rel="manifest" href="/manifest.webmanifest"/>
   <link rel="apple-touch-icon" href="/icons/jjmclock-192.png"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>JJMClock — Panel de Administración</title>
   <!-- Tailwind CSS v3 CDN -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -1235,9 +1237,7 @@
       cargarPeriodo();
       cargarVacaciones();
       cargarNotificaciones();
-      document.getElementById('estadoPushAdmin').textContent = window.JJMNotificaciones?.disponible()
-        ? 'Activa los avisos en este dispositivo para recibir recordatorios de jornada.'
-        : 'Las notificaciones requieren un navegador compatible y una conexión segura (HTTPS).';
+      actualizarEstadoPushAdmin();
       // Refresco en segundo plano: el código y los nuevos miembros aparecen solos.
       window.setInterval(() => {
         if (vistaAdminActual === 'asistencia') cargarAsistenciasDia();
@@ -1415,11 +1415,38 @@
       } catch (err) { if (popup) popup.close(); error.textContent = err.message; error.classList.remove('hidden'); }
     }
 
+    async function actualizarEstadoPushAdmin() {
+      const estadoEl = document.getElementById('estadoPushAdmin');
+      const boton = document.getElementById('btnPushAdmin');
+      if (!estadoEl || !window.JJMNotificaciones) return;
+      if (!window.JJMNotificaciones.disponible()) {
+        estadoEl.textContent = 'Las notificaciones requieren un navegador compatible y una conexión segura (HTTPS).';
+        return;
+      }
+      const e = await window.JJMNotificaciones.estado('usuario');
+      if (e.suscrito) {
+        estadoEl.textContent = '✅ Activos en este dispositivo. Te llegarán avisos aunque cierres la página.';
+        if (boton) boton.textContent = 'Desactivar avisos';
+      } else if (e.permiso === 'granted') {
+        estadoEl.textContent = 'Permiso concedido, pero este dispositivo aún no está registrado. Presiona Activar avisos.';
+      } else if (e.permiso === 'denied') {
+        estadoEl.textContent = 'Notificaciones bloqueadas. Permítelas en Ajustes del sitio (ícono de candado).';
+      }
+    }
+
     async function activarNotificacionesAdmin() {
+      const estadoEl = document.getElementById('estadoPushAdmin');
+      const boton = document.getElementById('btnPushAdmin');
       try {
-        const mensaje = await window.JJMNotificaciones.activar('usuario');
-        document.getElementById('estadoPushAdmin').textContent = mensaje || 'Avisos activados en este dispositivo.';
-      } catch (error) { document.getElementById('estadoPushAdmin').textContent = error.message; }
+        const esActivo = await window.JJMNotificaciones.estado('usuario');
+        if (esActivo.suscrito && boton?.textContent.includes('Desactivar')) {
+          estadoEl.textContent = await window.JJMNotificaciones.desactivar('usuario');
+          if (boton) boton.textContent = 'Activar avisos';
+          return;
+        }
+        estadoEl.textContent = await window.JJMNotificaciones.activar('usuario');
+        if (boton) boton.textContent = 'Desactivar avisos';
+      } catch (error) { estadoEl.textContent = error.message; }
     }
 
     async function copiarCodigoEquipo() {

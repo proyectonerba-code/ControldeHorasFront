@@ -7,6 +7,8 @@
   <meta name="theme-color" content="#760009">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icons/jjmclock-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>JJMClock · Superadministración</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -230,7 +232,8 @@
     function abrirPago(id){const e=equipos.find(x=>x.id===Number(id));if(!e)return;pagoEmpresaId=e.id;byId('paymentCompany').textContent=`${e.nombre} · Vencimiento actual: ${e.fecha_fin_suscripcion||'sin definir'}`;byId('paymentAmount').value=e.monto_ciclo_mxn||'';byId('paymentEnd').value=fechaMesesDesde(e.fecha_fin_suscripcion&&e.fecha_fin_suscripcion>hoyISO()?e.fecha_fin_suscripcion:hoyISO(),e.periodicidad==='anual'?12:1);byId('paymentNote').value='';abrirModal('paymentModal');}
     byId('paymentForm').addEventListener('submit',async e=>{e.preventDefault();try{await request(`/api/superadmin/equipos/${pagoEmpresaId}/pagos`,{method:'POST',body:JSON.stringify({monto_mxn:Number(byId('paymentAmount').value),fecha_fin_suscripcion:byId('paymentEnd').value,nota:byId('paymentNote').value})});cerrarModal('paymentModal');mostrarToast('Pago registrado y membresía renovada.');await actualizarEquipos();}catch(err){mostrarToast(err.message,true);}});
     byId('teamsBody').addEventListener('click',async e=>{const copy=e.target.closest('[data-copy]');if(copy){try{await navigator.clipboard.writeText(copy.dataset.copy);mostrarToast('Código copiado.');}catch{mostrarToast('No se pudo copiar el código.',true);}return;}const button=e.target.closest('[data-action]');if(!button)return;const id=Number(button.dataset.id);if(button.dataset.action==='activate')abrirActivacion(id);if(button.dataset.action==='payment')abrirPago(id);if(button.dataset.action==='decline'){const motivo=prompt('Motivo de rechazo (opcional):','Solicitud no aprobada.');if(motivo===null)return;try{await request(`/api/superadmin/equipos/${id}/declinar`,{method:'POST',body:JSON.stringify({motivo})});mostrarToast('Solicitud declinada.');await actualizarEquipos();}catch(err){mostrarToast(err.message,true);}}if(button.dataset.action==='archive'){if(!confirm('Se archivará el equipo y se desactivará su código. El historial de asistencia y pagos se conservará. ¿Continuar?'))return;try{await request(`/api/superadmin/equipos/${id}`,{method:'DELETE'});mostrarToast('Equipo archivado; sus datos quedaron conservados.');await actualizarEquipos();}catch(err){mostrarToast(err.message,true);}}if(button.dataset.action==='eliminar'){if(!confirm('¿ELIMINAR DEFINITIVAMENTE este equipo y TODOS sus datos (trabajadores, asistencias, pagos)? Esta acción NO se puede deshacer.'))return;try{const r=await request(`/api/superadmin/equipos/${id}/eliminar`,{method:'DELETE'});mostrarToast(r.mensaje);await actualizarEquipos();}catch(err){mostrarToast(err.message,true);}}});
-    async function activarPushSuperadmin(){try{const result=await window.JJMNotificaciones.activar('superadmin');mostrarToast(result||'Avisos activados en este dispositivo.');}catch(err){mostrarToast(err.message,true);}}
+    async function actualizarEstadoPushSuperadmin(){const b=byId('pushButton');if(!b||!window.JJMNotificaciones)return;if(!window.JJMNotificaciones.disponible())return;const e=await window.JJMNotificaciones.estado('superadmin');b.querySelector('span:last-child').textContent=e.suscrito?'Avisos activos':'Activar avisos';}
+    async function activarPushSuperadmin(){const b=byId('pushButton');try{const actual=await window.JJMNotificaciones.estado('superadmin');if(actual.suscrito){mostrarToast(await window.JJMNotificaciones.desactivar('superadmin'));if(b)b.querySelector('span:last-child').textContent='Activar avisos';return;}const result=await window.JJMNotificaciones.activar('superadmin');mostrarToast(result||'Avisos activados en este dispositivo.');if(b)b.querySelector('span:last-child').textContent='Avisos activos';}catch(err){mostrarToast(err.message,true);}}
 
     // ---- Renovaciones / cuotas ----
     function renderRenovaciones(){
@@ -299,6 +302,7 @@
 
     window.addEventListener('click',e=>{if(e.target.classList.contains('modal-backdrop'))e.target.classList.add('hidden');});
     cargarSesion();
+    actualizarEstadoPushSuperadmin();
     // Refresco en tiempo real: cada 8 s sin redibujar si no hay cambios.
     // Así, cuando apruebas en un dispositivo, el otro ve la solicitud salir y el código aparecer.
     window.setInterval(()=>{if(superadmin)actualizarEquipos(true);},8000);
