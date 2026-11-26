@@ -1194,10 +1194,17 @@
       document.getElementById('estadoPushAdmin').textContent = window.JJMNotificaciones?.disponible()
         ? 'Activa los avisos en este dispositivo para recibir recordatorios de jornada.'
         : 'Las notificaciones requieren un navegador compatible y una conexión segura (HTTPS).';
+      // Refresco en segundo plano: el código aparece en cuanto el superadmin activa el equipo.
       window.setInterval(() => {
         if (vistaAdminActual === 'asistencia') cargarAsistenciasDia();
-        else if (vistaAdminActual === 'resumen') { cargarResumen(); cargarSuscripcionEquipo(); }
-      }, 60000);
+        else if (vistaAdminActual === 'resumen') { cargarResumen(); cargarSuscripcionEquipo(true); }
+        else { cargarSuscripcionEquipo(true); }
+      }, 8000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        if (vistaAdminActual === 'asistencia') cargarAsistenciasDia();
+        cargarSuscripcionEquipo(true);
+      });
 
       if (localStorage.getItem('jjm_sidebar_collapsed') === '1') {
         const sidebar = document.querySelector('.admin-sidebar');
@@ -1228,16 +1235,26 @@
 
     let datosSuscripcionEquipo = null;
     let solicitudEsAmpliacion = false;
-    async function cargarSuscripcionEquipo() {
+    let firmaSuscripcion = '';
+    async function cargarSuscripcionEquipo(soloSiCambio = false) {
       const cont = document.getElementById('suscripcionEquipoContenido');
       if (!cont) return;
       try {
         const res = await fetch('/api/admin/suscripcion');
         const data = await res.json();
-        if (!data.ok) throw new Error(data.error || 'No se pudo cargar la membresía.');
-        datosSuscripcionEquipo = data.suscripcion;
-        renderSuscripcionEquipo(datosSuscripcionEquipo);
-      } catch (error) { cont.innerHTML = `<div class="p-5 text-sm text-danger">${escaparHTML(error.message)}</div>`; }
+        if (!data.ok) { if (!soloSiCambio) throw new Error(data.error || 'No se pudo cargar la membresía.'); return; }
+        const s = data.suscripcion;
+        const firma = JSON.stringify(s);
+        if (soloSiCambio && firma === firmaSuscripcion) return;
+        const antes = datosSuscripcionEquipo;
+        firmaSuscripcion = firma;
+        datosSuscripcionEquipo = s;
+        renderSuscripcionEquipo(s);
+        // Avisar cuando el superadmin activa la membresía y aparece el código.
+        if (antes && antes.estado !== 'activa' && s.estado === 'activa' && s.codigo_equipo) {
+          if (typeof mostrarToast === 'function') mostrarToast('¡Tu equipo fue activado! Ya puedes copiar y compartir tu código.');
+        }
+      } catch (error) { if (!soloSiCambio) cont.innerHTML = `<div class="p-5 text-sm text-danger">${escaparHTML(error.message)}</div>`; }
     }
 
     function renderSuscripcionEquipo(s) {
