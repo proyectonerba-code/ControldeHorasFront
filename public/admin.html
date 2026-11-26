@@ -866,6 +866,7 @@
               <input type="number" id="vacacionesDias" class="px-2 py-1.5 bg-surface-container-low text-on-surface border border-outline-variant" min="1" max="365" placeholder="Días" required aria-label="Días solicitados">
               <input type="text" id="vacacionesMotivo" class="md:col-span-4 px-2 py-1.5 bg-surface-container-low text-on-surface border border-outline-variant" maxlength="300" placeholder="Motivo (opcional)" aria-label="Motivo">
               <button type="submit" class="md:col-span-2 px-3 py-1.5 bg-primary text-on-primary font-label-technical text-label-technical uppercase">Registrar en bitácora</button>
+              <p class="md:col-span-6 text-[11px] text-secondary -mt-1">Los días se calculan automáticamente (lunes a viernes) al elegir el rango. Puedes ajustarlos si la empresa trabaja otros días.</p>
             </form>
             <div class="overflow-x-auto">
               <table class="admin-data-table">
@@ -2418,11 +2419,14 @@
         const badge = estadoActual === 'aprobada' ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">Aprobada</span>'
           : estadoActual === 'rechazada' ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">Rechazada</span>'
           : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">Pendiente</span>';
+        const transcurridos = Number(v.dias_transcurridos || 0);
+        const diasCelda = `<span class="font-bold">${v.dias_solicitados}</span>`
+          + (transcurridos > 0 ? `<div class="text-[10px] text-secondary">${transcurridos} transcurridos</div>` : '');
         tr.innerHTML = `
           <td>${escaparHTML(v.nombre)}</td>
           <td>${escaparHTML(v.fecha_ini)}</td>
           <td>${escaparHTML(v.fecha_fin)}</td>
-          <td>${v.dias_solicitados}</td>
+          <td>${diasCelda}</td>
           <td>${restante}</td>
           <td>${badge}</td>
           <td>${escaparHTML(v.motivo || '—')}</td>
@@ -2438,6 +2442,23 @@
         tbody.appendChild(tr);
       });
     }
+
+    function calcularDiasVacaciones() {
+      const ini = document.getElementById('vacacionesFechaIni').value;
+      const fin = document.getElementById('vacacionesFechaFin').value;
+      const input = document.getElementById('vacacionesDias');
+      if (!ini || !fin || fin < ini) return;
+      const final = new Date(fin + 'T12:00:00');
+      let total = 0;
+      for (let d = new Date(ini + 'T12:00:00'); d <= final; d.setDate(d.getDate() + 1)) {
+        const dia = d.getDay();
+        if (dia !== 0 && dia !== 6) total++;
+      }
+      if (total > 0) input.value = total;
+    }
+    ['vacacionesFechaIni', 'vacacionesFechaFin'].forEach(id => {
+      document.getElementById(id).addEventListener('change', calcularDiasVacaciones);
+    });
 
     document.getElementById('formVacaciones').addEventListener('submit', async (e) => {
       e.preventDefault();
