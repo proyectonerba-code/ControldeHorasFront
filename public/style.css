@@ -393,3 +393,39 @@ footer.bg-white {
 /* Utilidades de texto */
 .text-danger { color: #dc3545 !important; }
 .border-danger { border-color: #dc3545 !important; }
+
+/*********************************************************************************
+ * RESPONSIVIDAD GLOBAL — JJMClock
+ *********************************************************************************/
+/* Evita desbordamiento horizontal en cualquier pantalla */
+html, body { max-width: 100%; overflow-x: hidden; }
+img { max-width: 100%; height: auto; }
+
+/* Pestañas de acceso: se adaptan en pantallas angostas */
+.login-tab { font-size: 0.875rem; padding: 0.55rem 0.35rem; white-space: nowrap; }
+@media (max-width: 380px) {
+  .login-tab { font-size: 0.75rem; padding: 0.5rem 0.2rem; }
+  .login-card { padding: 28px 18px !important; }
+}
+
+/* Campos táctiles: altura mínima cómoda en móvil */
+@media (pointer: coarse) {
+  input, select, textarea, button { min-height: 44px; }
+  .btn { min-height: 44px; }
+}
+
+/* Tablas con scroll horizontal suave en móvil */
+.table-responsive, .admin-table-wrap, .overflow-x-auto {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ajustes generales para móvil */
+@media (max-width: 640px) {
+  .btn-grupo { grid-template-columns: 1fr 1fr; }
+  .estado-grid { grid-template-columns: 1fr 1fr; }
+  .card { padding: 16px; margin-bottom: 16px; }
+  main { padding: 16px 12px !important; }
+  header { padding: 10px 14px; }
+  header .logo { font-size: 1rem; }
+}

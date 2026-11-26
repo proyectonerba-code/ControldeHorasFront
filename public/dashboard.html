@@ -48,6 +48,20 @@
     .glow-red-box {
       box-shadow: 0 4px 14px -2px rgba(220, 38, 38, 0.3);
     }
+    /* Responsivo: en móvil se mantiene la tarjeta compacta; en desktop se expande */
+    .attendance-card { width: 100%; max-width: 390px; }
+    @media (min-width: 768px) {
+      .attendance-card { max-width: 640px; }
+      .clock-lg { font-size: 5.5rem !important; }
+      .action-btn { min-height: 76px !important; }
+    }
+    @media (max-width: 360px) {
+      .clock-lg { font-size: 3.5rem !important; }
+      .action-btn { font-size: 10px !important; padding: 12px 6px !important; }
+      .attendance-card { border-radius: 14px !important; }
+    }
+    /* Evita que el reloj se desborde en pantallas angostas */
+    #live-clock { font-variant-numeric: tabular-nums; white-space: nowrap; }
   </style>
 </head>
 <body class="bg-[#f8fafc] text-[#0f172a] min-h-screen flex flex-col justify-center items-center p-3 sm:p-6 font-sans antialiased selection:bg-red-600 selection:text-white">
@@ -56,7 +70,7 @@
   <div id="msg" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-[90%] px-4 py-2.5 rounded-xl text-sm font-semibold shadow-card-light border"></div>
 
   <!-- Pantalla de bloqueo por ubicación -->
-  <div id="ubicacionBloqueo" class="hidden w-full max-w-[390px] mb-4">
+  <div id="ubicacionBloqueo" class="hidden w-full attendance-card mb-4">
     <div class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center shadow-card-light">
       <div class="mx-auto w-14 h-14 rounded-2xl bg-red-100 border border-red-200 flex items-center justify-center text-[#dc2626] mb-3.5 shadow-sm">
         <span class="material-symbols-outlined text-2xl">location_off</span>
@@ -75,7 +89,7 @@
   </div>
 
   <!-- Mobile Viewport Container (empleado) -->
-  <main class="w-full max-w-[390px] min-h-[600px] bg-[#f8fafc] border border-slate-200 rounded-2xl shadow-xl flex flex-col overflow-hidden relative">
+  <main class="w-full attendance-card min-h-[600px] bg-[#f8fafc] border border-slate-200 rounded-2xl shadow-xl flex flex-col overflow-hidden relative">
     <!-- Header con reloj -->
     <header class="pt-6 pb-5 px-5 bg-white border-b border-slate-200/80" data-purpose="server-clock-header">
       <div class="flex items-center justify-center mb-3">
@@ -85,7 +99,7 @@
         <span class="text-[11px] font-bold tracking-[0.22em] text-slate-500 uppercase">Hora Oficial de Servidor</span>
       </div>
       <div class="mt-2 text-center">
-        <h1 class="text-6xl font-black tracking-tight text-[#dc2626] font-mono clock-display" id="live-clock">10:33:37</h1>
+        <h1 class="text-6xl font-black tracking-tight text-[#dc2626] font-mono clock-display clock-lg" id="live-clock">10:33:37</h1>
       </div>
     </header>
 
@@ -106,10 +120,10 @@
 
       <!-- Marcaciones del turno -->
       <section class="grid grid-cols-2 gap-2.5 pt-1" data-purpose="attendance-actions">
-        <button id="btnEntrada" class="py-4 px-3 rounded-xl bg-[#dc2626] hover:bg-[#b91c1c] text-white font-extrabold text-xs tracking-wider glow-red-box transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('entrada')" disabled>Marcar entrada</button>
-        <button id="btnSalidaComida" class="py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('comida_entrada')" disabled>Salir a comer</button>
-        <button id="btnRegresoComida" class="py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('comida_salida')" disabled>Regresar de comida</button>
-        <button id="btnSalida" class="py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('salida')" disabled>Marcar salida</button>
+        <button id="btnEntrada" class="action-btn py-4 px-3 rounded-xl bg-[#dc2626] hover:bg-[#b91c1c] text-white font-extrabold text-xs tracking-wider glow-red-box transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('entrada')" disabled>Marcar entrada</button>
+        <button id="btnSalidaComida" class="action-btn py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('comida_entrada')" disabled>Salir a comer</button>
+        <button id="btnRegresoComida" class="action-btn py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('comida_salida')" disabled>Regresar de comida</button>
+        <button id="btnSalida" class="action-btn py-4 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider border border-slate-200 shadow-sm transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" type="button" onclick="marcar('salida')" disabled>Marcar salida</button>
       </section>
       <p id="txtAyudaMarcacion" class="-mt-2 text-center text-[11px] leading-4 text-slate-500">Marca tu entrada para habilitar las demás opciones.</p>
 
