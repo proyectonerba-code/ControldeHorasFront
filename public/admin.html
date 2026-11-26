@@ -1156,16 +1156,18 @@
       document.getElementById('estadoPushAdmin').textContent = window.JJMNotificaciones?.disponible()
         ? 'Activa los avisos en este dispositivo para recibir recordatorios de jornada.'
         : 'Las notificaciones requieren un navegador compatible y una conexión segura (HTTPS).';
-      // Refresco en segundo plano: el código aparece en cuanto el superadmin activa el equipo.
+      // Refresco en segundo plano: el código y los nuevos miembros aparecen solos.
       window.setInterval(() => {
         if (vistaAdminActual === 'asistencia') cargarAsistenciasDia();
         else if (vistaAdminActual === 'resumen') { cargarResumen(); cargarSuscripcionEquipo(true); }
         else { cargarSuscripcionEquipo(true); }
+        if (vistaAdminActual === 'usuarios' || vistaAdminActual === 'equipos') cargarUsuarios(true);
       }, 8000);
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) return;
         if (vistaAdminActual === 'asistencia') cargarAsistenciasDia();
         cargarSuscripcionEquipo(true);
+        if (vistaAdminActual === 'usuarios' || vistaAdminActual === 'equipos') cargarUsuarios(true);
       });
 
       if (localStorage.getItem('jjm_sidebar_collapsed') === '1') {
@@ -1605,12 +1607,17 @@
     let areasAdmin = [];
     let areaSetupPendiente = false;
 
-    async function cargarUsuarios() {
+    let firmaUsuarios = '';
+    async function cargarUsuarios(soloSiCambio = false) {
       const res = await fetch('/api/admin/usuarios');
       const data = await res.json();
       const tbody = document.getElementById('tbodyUsuarios');
+      if (!data.ok) { if (!soloSiCambio) mostrarMsg(data.error); return; }
+      const firma = JSON.stringify(data.usuarios || []);
+      if (soloSiCambio && firma === firmaUsuarios) return;
+      const cambio = firma !== firmaUsuarios;
+      firmaUsuarios = firma;
       tbody.innerHTML = '';
-      if (!data.ok) { mostrarMsg(data.error); return; }
       usuariosAdmin = data.usuarios || [];
       actualizarSelectoresReportes();
       renderAreas();
@@ -1656,6 +1663,9 @@
         tr.querySelector('.js-eliminar-usuario').addEventListener('click', () => eliminarUsuario(u.id));
         tbody.appendChild(tr);
       });
+      if (cambio && soloSiCambio && typeof mostrarToast === 'function') {
+        mostrarToast('Lista de trabajadores actualizada.');
+      }
     }
 
     function actualizarSelectoresReportes() {
