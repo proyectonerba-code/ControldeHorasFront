@@ -160,7 +160,8 @@
     }
     document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>cambiarVista(b.dataset.view)));
     byId('searchTeams').addEventListener('input',renderEquipos); byId('statusFilter').addEventListener('change',renderEquipos);
-    async function actualizarEquipos(){try{const data=await request('/api/superadmin/equipos');equipos=data.equipos||[];window.lastAudit=data.auditoria||[];byId('statPending').textContent=data.pendientes??0;byId('statActive').textContent=data.activos??0;byId('statDue').textContent=data.por_vencer??0;byId('statWorkers').textContent=equipos.reduce((s,e)=>s+Number(e.cupos_ocupados||0),0);renderEquipos();if(currentView==='actividad')renderActividad();}catch(err){if(err.message.includes('Inicia sesión'))await cargarSesion();else mostrarToast(err.message,true);}}
+    let firmaEquipos='';
+    async function actualizarEquipos(soloSiCambio=false){try{const data=await request('/api/superadmin/equipos');const lista=data.equipos||[];const firma=JSON.stringify({e:lista,a:data.auditoria||[],p:data.pendientes,x:data.activos,v:data.por_vencer});if(soloSiCambio&&firma===firmaEquipos)return;const huboCambio=firma!==firmaEquipos;firmaEquipos=firma;equipos=lista;window.lastAudit=data.auditoria||[];byId('statPending').textContent=data.pendientes??0;byId('statActive').textContent=data.activos??0;byId('statDue').textContent=data.por_vencer??0;byId('statWorkers').textContent=equipos.reduce((s,e)=>s+Number(e.cupos_ocupados||0),0);renderEquipos();if(currentView==='actividad')renderActividad();if(huboCambio&&soloSiCambio)mostrarToast('Lista actualizada.');}catch(err){if(err.message.includes('Inicia sesión'))await cargarSesion();else if(!soloSiCambio)mostrarToast(err.message,true);}}
     function statusClass(status){return status==='activa'?'active':status==='declinada'?'denied':['vencida','suspendida'].includes(status)?'expired':'pending';}
     function statusLabel(status){return ({activa:'Activa',pendiente:'Pendiente',solicitada:'Solicitud nueva',solicitada_ampliacion:'Ampliación solicitada',declinada:'Declinada',vencida:'Vencida',suspendida:'Suspendida',archivada:'Archivada'})[status]||status||'Pendiente';}
     function filteredTeams(){const query=byId('searchTeams').value.trim().toLowerCase();const filter=byId('statusFilter').value;return equipos.filter(e=>{if(currentView==='solicitudes'&&!(['pendiente','declinada'].includes(e.estado)||String(e.solicitud_estado||'').startsWith('solicitada')))return false;if(currentView==='equipos'&&e.estado!=='activa')return false;if(currentView==='cuotas'&&e.estado==='declinada')return false;if(filter&&e.estado!==filter)return false;const hay=`${e.nombre} ${e.administrador?.nombre||''} ${e.administrador?.correo||''}`.toLowerCase();return !query||hay.includes(query);});}
@@ -177,7 +178,10 @@
     async function activarPushSuperadmin(){try{const result=await window.JJMNotificaciones.activar('superadmin');mostrarToast(result||'Avisos activados en este dispositivo.');}catch(err){mostrarToast(err.message,true);}}
     window.addEventListener('click',e=>{if(e.target.classList.contains('modal-backdrop'))e.target.classList.add('hidden');});
     cargarSesion();
-    window.setInterval(()=>{if(superadmin)actualizarEquipos();},60000);
+    // Refresco en tiempo real: cada 8 s sin redibujar si no hay cambios.
+    // Así, cuando apruebas en un dispositivo, el otro ve la solicitud salir y el código aparecer.
+    window.setInterval(()=>{if(superadmin)actualizarEquipos(true);},8000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&superadmin)actualizarEquipos(true);});
   </script>
 </body>
 </html>
