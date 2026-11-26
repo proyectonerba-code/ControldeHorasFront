@@ -126,13 +126,15 @@
     .admin-sidebar.collapsed .sidebar-brand-subtitle,
     .admin-sidebar.collapsed .sidebar-team,
     .admin-sidebar.collapsed .admin-nav-group-label,
-    .admin-sidebar.collapsed .admin-nav-link span,
+    .admin-sidebar.collapsed .admin-nav-link .nav-text,
     .admin-sidebar.collapsed .sidebar-footer{display:none;}
     .admin-sidebar.collapsed .admin-side-nav{flex-direction:column;gap:3px;overflow-y:auto;}
     .admin-sidebar.collapsed .admin-nav-link{justify-content:center;padding:9px 6px;width:auto;min-width:52px;border-radius:0;}
     .admin-sidebar.collapsed .admin-nav-link .material-symbols-outlined{font-size:20px;}
     .admin-sidebar.collapsed .admin-nav-link:hover{background:#eff4ff;}
     .admin-shell.sidebar-collapsed{grid-template-columns:64px minmax(0,1fr);}
+    .admin-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(11,28,48,.45);z-index:40;backdrop-filter:blur(2px);}
+    .admin-sidebar-overlay.visible{display:block;}
     .admin-toggle-sidebar{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid #dce4f5;background:#fff;color:#364158;border-radius:6px;cursor:pointer;margin-right:10px;transition:all .15s;}
     .admin-toggle-sidebar:hover{background:#eff4ff;color:#760009;}
     .admin-toggle-sidebar[aria-pressed="true"]{background:#760009;color:#fff;border-color:#760009;}
@@ -324,6 +326,7 @@
       </nav>
       <div class="sidebar-footer">JJMClock · Panel administrador</div>
     </aside>
+    <div class="admin-sidebar-overlay" onclick="toggleSidebar()" aria-hidden="true"></div>
 
     <div class="admin-workspace">
       <header class="admin-topbar">
@@ -344,6 +347,21 @@
 
   <!-- Mensajes globales -->
   <div id="msg" class="hidden px-6 py-2 text-sm font-medium bg-error-container text-on-error-container border-b border-outline-variant"></div>
+
+  <!-- Avisos del superadmin dentro de la app -->
+  <div id="avisosAdminPanel" class="hidden px-6 py-3">
+    <div class="bg-white border-l-4 border-[#991b1b] shadow-card p-4 flex flex-wrap items-start justify-between gap-3">
+      <div class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-[#991b1b]">campaign</span>
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-secondary">Aviso de JJMClock</div>
+          <div id="avisosAdminTitulo" class="text-sm font-bold text-on-surface mt-1"></div>
+          <div id="avisosAdminCuerpo" class="text-sm text-secondary mt-1 whitespace-pre-wrap"></div>
+        </div>
+      </div>
+      <button type="button" class="text-xs font-bold text-secondary hover:text-primary" onclick="cerrarAvisoAdmin()">Entendido</button>
+    </div>
+  </div>
 
   <main class="admin-main space-y-4">
     <!-- KPI Matrix -->
@@ -1127,6 +1145,31 @@
       }
     }
 
+    // ---------- Avisos dentro de la app ----------
+    let ultimoAvisoAdminId = 0;
+    async function cargarAvisosAdmin() {
+      try {
+        const res = await fetch('/api/avisos');
+        const data = await res.json();
+        if (!data.ok) return;
+        const avisos = (data.avisos || []).filter(a => a.origen === 'superadmin' && !a.leido);
+        if (!avisos.length) { document.getElementById('avisosAdminPanel').classList.add('hidden'); return; }
+        const a = avisos[0];
+        document.getElementById('avisosAdminTitulo').textContent = a.titulo;
+        document.getElementById('avisosAdminCuerpo').textContent = a.cuerpo;
+        document.getElementById('avisosAdminPanel').classList.remove('hidden');
+        ultimoAvisoAdminId = a.id;
+      } catch(e) {}
+    }
+    async function cerrarAvisoAdmin() {
+      if (ultimoAvisoAdminId) {
+        try { await fetch(`/api/avisos/${ultimoAvisoAdminId}/leido`, { method:'POST' }); } catch(e){}
+      }
+      document.getElementById('avisosAdminPanel').classList.add('hidden');
+      ultimoAvisoAdminId = 0;
+      cargarAvisosAdmin();
+    }
+
     // ---------- Auth ----------
     async function initAdmin() {
       const res = await fetch('/api/perfil');
@@ -1175,6 +1218,8 @@
       const diasHasta = document.getElementById('diasHasta');
       if (diasHasta) diasHasta.value = fechaHoyMX();
 
+      cargarAvisosAdmin();
+      window.setInterval(cargarAvisosAdmin, 8000);
       cargarConfigOficina();
       cargarHorarios();
       cargarPeriodo();
@@ -1197,16 +1242,20 @@
         if (vistaAdminActual === 'usuarios' || vistaAdminActual === 'equipos') cargarUsuarios(true);
       });
 
-      if (localStorage.getItem('jjm_sidebar_collapsed') === '1') {
-        const sidebar = document.querySelector('.admin-sidebar');
-        const shell = document.querySelector('.admin-shell');
-        const btn = document.querySelector('.admin-toggle-sidebar');
-        const icon = btn.querySelector('.material-symbols-outlined');
-        sidebar.classList.add('collapsed');
-        shell.classList.add('sidebar-collapsed');
-        btn.setAttribute('aria-pressed', 'true');
-        btn.setAttribute('aria-label', 'Mostrar menú lateral');
-        icon.textContent = 'chevron_right';
+      // El sidebar siempre arranca expandido: evita que quede una franja sin menú.
+      localStorage.removeItem('jjm_sidebar_collapsed');
+      const sidebarInit = document.querySelector('.admin-sidebar');
+      const shellInit = document.querySelector('.admin-shell');
+      const btnInit = document.querySelector('.admin-toggle-sidebar');
+      const iconInit = btnInit?.querySelector('.material-symbols-outlined');
+      sidebarInit?.classList.remove('collapsed');
+      shellInit?.classList.remove('sidebar-collapsed');
+      if (window.innerWidth <= 900) {
+        btnInit?.setAttribute('aria-label', 'Abrir menú');
+        if (iconInit) iconInit.textContent = 'menu';
+      } else {
+        btnInit?.setAttribute('aria-label', 'Ocultar menú lateral');
+        if (iconInit) iconInit.textContent = 'chevron_left';
       }
     }
 
@@ -1573,44 +1622,45 @@
       const sidebar = document.querySelector('.admin-sidebar');
       const shell = document.querySelector('.admin-shell');
       const btn = document.querySelector('.admin-toggle-sidebar');
-      const icon = btn.querySelector('.material-symbols-outlined');
-      const col = sidebar.classList.toggle('collapsed');
-      shell.classList.toggle('sidebar-collapsed', col);
-      btn.setAttribute('aria-pressed', String(col));
-      btn.setAttribute('aria-label', col ? 'Mostrar menú lateral' : 'Ocultar menú lateral');
-      icon.textContent = col ? 'chevron_right' : 'chevron_left';
-      localStorage.setItem('jjm_sidebar_collapsed', col ? '1' : '0');
-    }
+      const icon = btn?.querySelector('.material-symbols-outlined');
 
-    // Cerrar sidebar móvil al cambiar de vista
-    const _cambiarVistaAdminOriginal = cambiarVistaAdmin;
-    function cambiarVistaAdmin(id) {
-      _cambiarVistaAdminOriginal(id);
-      const sidebar = document.querySelector('.admin-sidebar');
-      const shell = document.querySelector('.admin-shell');
-      const btn = document.querySelector('.admin-toggle-sidebar');
-      const icon = btn.querySelector('.material-symbols-outlined');
-      if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
-        sidebar.classList.remove('open');
-        shell.classList.remove('sidebar-open');
-        btn.setAttribute('aria-pressed', 'false');
-        btn.setAttribute('aria-label', 'Abrir menú');
-        icon.textContent = 'menu';
+      if (window.innerWidth <= 900) {
+        // Móvil/tablet: abre o cierra el drawer
+        const abierto = sidebar.classList.toggle('open');
+        shell.classList.toggle('sidebar-open', abierto);
+        const overlay = document.querySelector('.admin-sidebar-overlay');
+        if (overlay) overlay.classList.toggle('visible', abierto);
+        btn?.setAttribute('aria-pressed', String(abierto));
+        btn?.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
+        if (icon) icon.textContent = abierto ? 'close' : 'menu';
+        return;
       }
+
+      // Desktop: colapsa o expande el menú lateral
+      const colapsado = sidebar.classList.toggle('collapsed');
+      shell.classList.toggle('sidebar-collapsed', colapsado);
+      btn?.setAttribute('aria-pressed', String(colapsado));
+      btn?.setAttribute('aria-label', colapsado ? 'Mostrar menú lateral' : 'Ocultar menú lateral');
+      if (icon) icon.textContent = colapsado ? 'chevron_right' : 'chevron_left';
     }
 
-    // Cerrar sidebar móvil al hacer clic en el overlay o redimensionar
+    // Ajustar sidebar al redimensionar
     window.addEventListener('resize', () => {
       const sidebar = document.querySelector('.admin-sidebar');
       const shell = document.querySelector('.admin-shell');
       const btn = document.querySelector('.admin-toggle-sidebar');
-      const icon = btn.querySelector('.material-symbols-outlined');
+      const icon = btn?.querySelector('.material-symbols-outlined');
+      const overlay = document.querySelector('.admin-sidebar-overlay');
       if (window.innerWidth > 900) {
         sidebar.classList.remove('open');
         shell.classList.remove('sidebar-open');
-        btn.setAttribute('aria-pressed', 'false');
-        btn.setAttribute('aria-label', 'Ocultar menú lateral');
-        icon.textContent = 'chevron_left';
+        if (overlay) overlay.classList.remove('visible');
+        btn?.setAttribute('aria-pressed', 'false');
+        btn?.setAttribute('aria-label', 'Ocultar menú lateral');
+        if (icon) icon.textContent = 'chevron_left';
+      } else {
+        // Al pasar a móvil, el icono debe ser menú
+        if (!sidebar.classList.contains('open') && icon) icon.textContent = 'menu';
       }
     });
 
@@ -1662,6 +1712,21 @@
       if (id === 'resumen') { cargarResumen(); cargarSuscripcionEquipo(); }
       if (id === 'oficina' && mapaOficina) setTimeout(() => mapaOficina.invalidateSize(), 120);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Cerrar sidebar móvil al elegir una vista
+      const sidebar = document.querySelector('.admin-sidebar');
+      const shell = document.querySelector('.admin-shell');
+      const btnToggle = document.querySelector('.admin-toggle-sidebar');
+      const iconBtn = btnToggle?.querySelector('.material-symbols-outlined');
+      if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        shell.classList.remove('sidebar-open');
+        const overlay = document.querySelector('.admin-sidebar-overlay');
+        if (overlay) overlay.classList.remove('visible', 'show', 'active');
+        btnToggle?.setAttribute('aria-pressed', 'false');
+        btnToggle?.setAttribute('aria-label', 'Abrir menú');
+        if (iconBtn) iconBtn.textContent = 'menu';
+      }
     }
 
     function abrirTab(id) { cambiarVistaAdmin(id); }
