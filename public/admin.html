@@ -121,18 +121,25 @@
     .rounded-none { border-radius: 0 !important; }
     .admin-shell{min-height:100vh;display:grid;grid-template-columns:248px minmax(0,1fr);transition:grid-template-columns .28s ease;}
     .admin-sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;background:#fff;border-right:1px solid #dce4f5;padding:20px 14px;z-index:30;transition:width .28s ease;}
-    .admin-sidebar.collapsed{width:64px;overflow-x:hidden;}
+    .admin-sidebar.collapsed{width:76px;overflow-x:visible;padding:20px 16px;}
+    .admin-sidebar.collapsed .sidebar-brand{justify-content:center;padding:0 0 20px;border-bottom:0;}
+    .admin-sidebar.collapsed .sidebar-brand-mark{width:44px;height:44px;}
     .admin-sidebar.collapsed .sidebar-brand-title,
     .admin-sidebar.collapsed .sidebar-brand-subtitle,
     .admin-sidebar.collapsed .sidebar-team,
     .admin-sidebar.collapsed .admin-nav-group-label,
     .admin-sidebar.collapsed .admin-nav-link .nav-text,
-    .admin-sidebar.collapsed .sidebar-footer{display:none;}
-    .admin-sidebar.collapsed .admin-side-nav{flex-direction:column;gap:3px;overflow-y:auto;}
-    .admin-sidebar.collapsed .admin-nav-link{justify-content:center;padding:9px 6px;width:auto;min-width:52px;border-radius:0;}
-    .admin-sidebar.collapsed .admin-nav-link .material-symbols-outlined{font-size:20px;}
-    .admin-sidebar.collapsed .admin-nav-link:hover{background:#eff4ff;}
-    .admin-shell.sidebar-collapsed{grid-template-columns:64px minmax(0,1fr);}
+    .admin-sidebar.collapsed .sidebar-footer,
+    .admin-sidebar.collapsed .admin-nav-group-label{display:none;}
+    .admin-sidebar.collapsed .admin-side-nav{flex-direction:column;gap:8px;overflow-y:auto;overflow-x:visible;}
+    .admin-sidebar.collapsed .admin-nav-link{position:relative;justify-content:center;align-items:center;padding:0;width:44px;height:44px;min-width:44px;margin:0 auto;border-radius:12px;background:#f1f4f9;}
+    .admin-sidebar.collapsed .admin-nav-link .material-symbols-outlined{font-size:22px;color:#334155;}
+    .admin-sidebar.collapsed .admin-nav-link:hover{background:#e5eaf2;}
+    .admin-sidebar.collapsed .admin-nav-link.is-active{background:#991b1b !important;box-shadow:0 3px 10px rgba(153,27,27,.28);}
+    .admin-sidebar.collapsed .admin-nav-link.is-active .material-symbols-outlined{color:#fff;}
+    .admin-sidebar.collapsed .admin-nav-link::after{content:attr(title);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:#0b1c30;color:#fff;padding:6px 10px;border-radius:7px;font:600 11px 'Geist',sans-serif;white-space:nowrap;opacity:0;pointer-events:none;z-index:100;transition:opacity .15s;box-shadow:0 4px 12px rgba(0,0,0,.18);}
+    .admin-sidebar.collapsed .admin-nav-link:hover::after{opacity:1;}
+    .admin-shell.sidebar-collapsed{grid-template-columns:76px minmax(0,1fr);}
     .admin-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(11,28,48,.45);z-index:40;backdrop-filter:blur(2px);}
     .admin-sidebar-overlay.visible{display:block;}
     .admin-toggle-sidebar{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid #dce4f5;background:#fff;color:#364158;border-radius:6px;cursor:pointer;margin-right:10px;transition:all .15s;}
@@ -309,20 +316,20 @@
       <div class="sidebar-team"><strong>Panel de equipo</strong><span>Administración y reportes</span></div>
       <nav class="admin-side-nav">
         <div class="admin-nav-group-label">Asistencia</div>
-        <button class="admin-nav-link is-active" data-admin-nav="asistencia" onclick="cambiarVistaAdmin('asistencia')" type="button" title="Asistencias del día"><span class="material-symbols-outlined">fact_check</span><span>Asistencias del día</span></button>
-        <button class="admin-nav-link" data-admin-nav="manual" onclick="cambiarVistaAdmin('manual')" type="button" title="Registro manual"><span class="material-symbols-outlined">edit_calendar</span><span>Registro manual</span></button>
-        <button class="admin-nav-link" data-admin-nav="reporte" onclick="cambiarVistaAdmin('reporte')" type="button" title="Reporte semanal"><span class="material-symbols-outlined">bar_chart</span><span>Reporte semanal</span></button>
-        <button class="admin-nav-link" data-admin-nav="individual" onclick="cambiarVistaAdmin('individual')" type="button" title="Reporte individual"><span class="material-symbols-outlined">person_search</span><span>Reporte individual</span></button>
+        <button class="admin-nav-link is-active" data-admin-nav="asistencia" onclick="cambiarVistaAdmin('asistencia')" type="button" title="Asistencias del día"><span class="material-symbols-outlined">fact_check</span><span class="nav-text">Asistencias del día</span></button>
+        <button class="admin-nav-link" data-admin-nav="manual" onclick="cambiarVistaAdmin('manual')" type="button" title="Registro manual"><span class="material-symbols-outlined">edit_calendar</span><span class="nav-text">Registro manual</span></button>
+        <button class="admin-nav-link" data-admin-nav="reporte" onclick="cambiarVistaAdmin('reporte')" type="button" title="Reporte semanal"><span class="material-symbols-outlined">bar_chart</span><span class="nav-text">Reporte semanal</span></button>
+        <button class="admin-nav-link" data-admin-nav="individual" onclick="cambiarVistaAdmin('individual')" type="button" title="Reporte individual"><span class="material-symbols-outlined">person_search</span><span class="nav-text">Reporte individual</span></button>
         <div class="admin-nav-group-label">General</div>
-        <button class="admin-nav-link" data-admin-nav="resumen" onclick="cambiarVistaAdmin('resumen')" type="button" title="Código y notificaciones"><span class="material-symbols-outlined">key</span><span>Código y notificaciones</span></button>
+        <button class="admin-nav-link" data-admin-nav="resumen" onclick="cambiarVistaAdmin('resumen')" type="button" title="Código y notificaciones"><span class="material-symbols-outlined">key</span><span class="nav-text">Código y notificaciones</span></button>
         <div class="admin-nav-group-label">Equipo</div>
-        <button class="admin-nav-link" data-admin-nav="usuarios" onclick="cambiarVistaAdmin('usuarios')" type="button" title="Usuarios"><span class="material-symbols-outlined">groups</span><span>Usuarios</span></button>
-        <button class="admin-nav-link" data-admin-nav="areas" onclick="cambiarVistaAdmin('areas')" type="button" title="Áreas y horarios"><span class="material-symbols-outlined">workspaces</span><span>Áreas y horarios</span></button>
-        <button class="admin-nav-link" data-admin-nav="horarios" onclick="cambiarVistaAdmin('horarios')" type="button" title="Horarios especiales"><span class="material-symbols-outlined">schedule</span><span>Horarios especiales</span></button>
-        <button class="admin-nav-link" data-admin-nav="periodo" onclick="cambiarVistaAdmin('periodo')" type="button" title="Periodo y vacaciones"><span class="material-symbols-outlined">event_available</span><span>Periodo y vacaciones</span></button>
-        <button class="admin-nav-link" data-admin-nav="oficina" onclick="cambiarVistaAdmin('oficina')" type="button" title="Ubicación y rango"><span class="material-symbols-outlined">location_on</span><span>Ubicación y rango</span></button>
+        <button class="admin-nav-link" data-admin-nav="usuarios" onclick="cambiarVistaAdmin('usuarios')" type="button" title="Usuarios"><span class="material-symbols-outlined">groups</span><span class="nav-text">Usuarios</span></button>
+        <button class="admin-nav-link" data-admin-nav="areas" onclick="cambiarVistaAdmin('areas')" type="button" title="Áreas y horarios"><span class="material-symbols-outlined">workspaces</span><span class="nav-text">Áreas y horarios</span></button>
+        <button class="admin-nav-link" data-admin-nav="horarios" onclick="cambiarVistaAdmin('horarios')" type="button" title="Horarios especiales"><span class="material-symbols-outlined">schedule</span><span class="nav-text">Horarios especiales</span></button>
+        <button class="admin-nav-link" data-admin-nav="periodo" onclick="cambiarVistaAdmin('periodo')" type="button" title="Periodo y vacaciones"><span class="material-symbols-outlined">event_available</span><span class="nav-text">Periodo y vacaciones</span></button>
+        <button class="admin-nav-link" data-admin-nav="oficina" onclick="cambiarVistaAdmin('oficina')" type="button" title="Ubicación y rango"><span class="material-symbols-outlined">location_on</span><span class="nav-text">Ubicación y rango</span></button>
         <div class="admin-nav-group-label">Archivos</div>
-        <button class="admin-nav-link" data-admin-nav="datos" onclick="cambiarVistaAdmin('datos')" type="button" title="Importar y exportar"><span class="material-symbols-outlined">import_export</span><span>Importar y exportar</span></button>
+        <button class="admin-nav-link" data-admin-nav="datos" onclick="cambiarVistaAdmin('datos')" type="button" title="Importar y exportar"><span class="material-symbols-outlined">import_export</span><span class="nav-text">Importar y exportar</span></button>
       </nav>
       <div class="sidebar-footer">JJMClock · Panel administrador</div>
     </aside>
