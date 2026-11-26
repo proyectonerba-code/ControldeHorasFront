@@ -146,6 +146,9 @@
     .admin-toggle-sidebar{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid #e2e8f0;background:#fff;color:#334155;border-radius:10px;cursor:pointer;margin-right:14px;transition:all .2s ease;box-shadow:0 2px 6px rgba(0,0,0,.08);font-size:18px;}
     .admin-toggle-sidebar:hover{background:#760009;color:#fff;border-color:#760009;box-shadow:0 4px 12px rgba(118,0,9,.18);transform:translateY(-1px);}
     .admin-toggle-sidebar[aria-pressed="true"]{background:#760009;color:#fff;border-color:#760009;}
+    @media(max-width:900px){
+      .admin-toggle-sidebar .material-symbols-outlined{font-size:24px;}
+    }
     .sidebar-brand{display:flex;align-items:center;gap:12px;padding:0 8px 28px;border-bottom:1px solid #eef2f7;}
     .sidebar-brand{display:flex;align-items:center;gap:11px;padding:0 7px 20px;border-bottom:1px solid #e1e8f5;}
     .sidebar-brand-mark{width:38px;height:38px;display:grid;place-items:center;background:#fff;border:1px solid #e1e8f5;overflow:hidden;}
@@ -306,31 +309,40 @@
     @media(max-width:1050px){.office-config-grid{grid-template-columns:1fr;}#mapaOficina{height:420px;}}
     @media(max-width:900px){
       .admin-shell{display:block;}
-      .admin-sidebar{height:auto;position:sticky;top:0;padding:10px 12px 8px;border-right:0;border-bottom:1px solid #dce4f5;}
-      .sidebar-brand{padding:0 5px 9px;border-bottom:0;}
-      .sidebar-brand-mark{width:32px;height:32px;}
-      .sidebar-team,.sidebar-footer,.admin-nav-group-label{display:none;}
-      .admin-side-nav{flex-direction:row;gap:4px;overflow-x:auto;padding:3px 0 1px;}
-      .admin-nav-link{width:auto;min-width:max-content;min-height:36px;padding:7px 9px;border-left:0;border-bottom:2px solid transparent;font-size:11px;}
-      .admin-nav-link.is-active{border-bottom-color:#760009;}
-      .admin-topbar{position:static;min-height:68px;padding:12px 16px;}
-      .admin-page-title{font-size:18px;}
-      .admin-page-subtitle{display:none;}
-      .admin-main{padding:16px;}
+      .admin-sidebar{height:100vh;position:fixed;top:0;left:0;width:280px;background:#fff;border-right:1px solid #dce4f5;padding:24px 16px 32px;z-index:50;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 16px rgba(0,0,0,.12);overflow-y:auto;}
+      .admin-sidebar.open{transform:translateX(0);}
+      .admin-sidebar-overlay{display:none;}
+      .admin-shell.sidebar-open .admin-sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;backdrop-filter:blur(2px);}
+      .sidebar-brand{padding:0 8px 20px;border-bottom:1px solid #e1e8f5;}
+      .sidebar-brand-mark{width:38px;height:38px;}
+      .sidebar-team,.sidebar-footer,.admin-nav-group-label{display:block;}
+      .admin-side-nav{flex-direction:column;gap:3px;overflow-y:auto;}
+      .admin-nav-link{width:100%;min-height:44px;padding:10px 12px;border-left:3px solid transparent;background:transparent;color:#364158;text-align:left;font:500 13px 'Geist',sans-serif;cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
+      .admin-nav-link .material-symbols-outlined{font-size:18px;color:#66738b;}
+      .admin-nav-link:hover{background:#eff4ff;color:#0b1c30;}
+      .admin-nav-link.is-active{background:#991b1b;color:#fff;border-left-color:#760009;font-weight:600;}
+      .admin-nav-link.is-active .material-symbols-outlined{color:#fff;}
+      .sidebar-footer{margin-top:auto;padding:14px 8px 2px;border-top:1px solid #e1e8f5;color:#64718a;font:600 10px 'Space Grotesk',sans-serif;letter-spacing:.08em;text-transform:uppercase;}
+      .admin-topbar{position:sticky;top:0;min-height:76px;padding:13px 24px;background:#fff;border-bottom:1px solid #dce4f5;z-index:20;}
+      .admin-page-title{font-size:20px;}
+      .admin-page-subtitle{display:block;}
+      .admin-main{width:100%;max-width:none;margin:0;padding:22px 24px 32px;}
       .daily-toolbar{align-items:flex-start;flex-direction:column;}
       .week-day-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
       .office-config-grid{grid-template-columns:1fr;}
     }
     @media(max-width:540px){
+      .admin-sidebar{width:100vw;}
       .admin-topbar{align-items:flex-start;}
       .admin-top-actions{gap:4px;}
       .admin-user-chip{max-width:130px;padding:6px;font-size:10px;}
       .admin-top-link{padding:6px;font-size:9px;}
-      .admin-main{padding:12px;}
+      .admin-main{padding:16px;}
       .daily-controls{width:100%;}
       .daily-control[type="search"]{flex:1;min-width:130px;}
       .week-day-grid{grid-template-columns:1fr;}
       .week-day-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}
+      .admin-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
     }
   </style>
 </head>
@@ -362,11 +374,12 @@
       </nav>
       <div class="sidebar-footer">JJMClock · Panel administrador</div>
     </aside>
+    <div class="admin-sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div class="admin-workspace">
       <header class="admin-topbar">
-        <button class="admin-toggle-sidebar" type="button" onclick="toggleSidebar()" aria-label="Ocultar menú lateral" aria-pressed="false">
-          <span class="material-symbols-outlined">chevron_left</span>
+        <button class="admin-toggle-sidebar" type="button" onclick="toggleSidebar()" aria-label="Menú" aria-pressed="false">
+          <span class="material-symbols-outlined">menu</span>
         </button>
         <div>
           <p class="admin-page-kicker">JJMClock · Administración</p>
@@ -1546,13 +1559,54 @@
       const shell = document.querySelector('.admin-shell');
       const btn = document.querySelector('.admin-toggle-sidebar');
       const icon = btn.querySelector('.material-symbols-outlined');
-      const col = sidebar.classList.toggle('collapsed');
-      shell.classList.toggle('sidebar-collapsed', col);
-      btn.setAttribute('aria-pressed', String(col));
-      btn.setAttribute('aria-label', col ? 'Mostrar menú lateral' : 'Ocultar menú lateral');
-      icon.textContent = col ? 'chevron_right' : 'chevron_left';
-      localStorage.setItem('jjm_sidebar_collapsed', col ? '1' : '0');
+      const isMobile = window.innerWidth <= 900;
+      if (isMobile) {
+        const open = sidebar.classList.toggle('open');
+        shell.classList.toggle('sidebar-open', open);
+        btn.setAttribute('aria-pressed', String(open));
+        btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+        icon.textContent = open ? 'close' : 'menu';
+      } else {
+        const col = sidebar.classList.toggle('collapsed');
+        shell.classList.toggle('sidebar-collapsed', col);
+        btn.setAttribute('aria-pressed', String(col));
+        btn.setAttribute('aria-label', col ? 'Mostrar menú lateral' : 'Ocultar menú lateral');
+        icon.textContent = col ? 'chevron_right' : 'chevron_left';
+        localStorage.setItem('jjm_sidebar_collapsed', col ? '1' : '0');
+      }
     }
+
+    // Cerrar sidebar móvil al cambiar de vista
+    const _cambiarVistaAdminOriginal = cambiarVistaAdmin;
+    function cambiarVistaAdmin(id) {
+      _cambiarVistaAdminOriginal(id);
+      const sidebar = document.querySelector('.admin-sidebar');
+      const shell = document.querySelector('.admin-shell');
+      const btn = document.querySelector('.admin-toggle-sidebar');
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        shell.classList.remove('sidebar-open');
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('aria-label', 'Abrir menú');
+        icon.textContent = 'menu';
+      }
+    }
+
+    // Cerrar sidebar móvil al hacer clic en el overlay o redimensionar
+    window.addEventListener('resize', () => {
+      const sidebar = document.querySelector('.admin-sidebar');
+      const shell = document.querySelector('.admin-shell');
+      const btn = document.querySelector('.admin-toggle-sidebar');
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (window.innerWidth > 900) {
+        sidebar.classList.remove('open');
+        shell.classList.remove('sidebar-open');
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('aria-label', 'Ocultar menú lateral');
+        icon.textContent = 'chevron_left';
+      }
+    });
 
     function cambiarVistaAdmin(id) {
       const vistas = {
