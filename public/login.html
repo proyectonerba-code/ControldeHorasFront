@@ -98,6 +98,7 @@
 
     async function enviar(endpoint, datos) {
       const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+      if (!res.ok) throw new Error(`Error ${res.status}`);
       return res.json();
     }
 
@@ -122,10 +123,27 @@
           correo: document.getElementById('correo').value,
           password: document.getElementById('password').value
         });
-        if (data.requiere_codigo) document.getElementById('loginCodigoBox').classList.remove('d-none');
+        if (data.requiere_codigo) {
+          document.getElementById('loginCodigoBox').classList.remove('d-none');
+          mostrarError('Este correo pertenece a varios equipos. Ingresa el código de tu equipo.');
+          return;
+        }
         if (!data.ok) return mostrarError(data.error || 'No se pudo iniciar sesión.');
+        // Limpiar código de empresa para próximas sesiones
+        document.getElementById('codigoLogin').value = '';
         irAlPanel(data.usuario);
-      } catch (error) { mostrarError('No se pudo conectar con el servidor.'); }
+      } catch (error) {
+        if (error.message && error.message.includes('Error 401')) {
+          mostrarError('Correo o contraseña incorrectos.');
+        } else if (error.message && error.message.includes('Error 403')) {
+          mostrarError('Tu equipo no está disponible. Contacta a tu administrador.');
+        } else if (error.message && error.message.includes('Error 409')) {
+          document.getElementById('loginCodigoBox').classList.remove('d-none');
+          mostrarError('Este correo pertenece a varios equipos. Ingresa el código de tu equipo.');
+        } else {
+          mostrarError('No se pudo conectar con el servidor. Intenta de nuevo.');
+        }
+      }
     });
 
     document.getElementById('formCrear').addEventListener('submit', async (e) => {
