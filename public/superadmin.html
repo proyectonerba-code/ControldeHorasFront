@@ -30,6 +30,20 @@
     .renewal-card .meta{font-size:11px;color:var(--muted);line-height:1.6}
     .renewal-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
     @media(max-width:760px){.renewals-grid{grid-template-columns:1fr}.shell{display:block}.sidebar{height:auto;position:static;padding:10px 12px 7px;gap:7px;border-right:0;border-bottom:1px solid var(--line)}.sidebar .brand{display:none}.side-caption,.side-footer{display:none}.nav{display:flex;overflow-x:auto;gap:4px}.nav button{min-width:max-content;padding:9px 10px;font-size:11px}.nav button .material-symbols-outlined{font-size:16px}.topbar{position:static;height:auto;padding:12px 14px}.topbar h1{font-size:15px}.topbar small{display:none}.top-actions{gap:5px}.icon-btn{font-size:10px;padding:7px}.page{padding:16px 12px 30px}.page-heading{align-items:flex-start;flex-direction:column}.page-heading h2{font-size:22px}.stats{gap:8px}.stat-card{padding:13px}.stat-value{font-size:21px}.toolbar{align-items:flex-start;flex-direction:column}.toolbar-tools{width:100%}.search{width:100%}.modal-grid{grid-template-columns:1fr}.auth-card{padding:25px 21px}}
+    /* Ajustes finos para iPhone 7+ */
+    @media(max-width:760px){
+      .nav{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}
+      .nav::-webkit-scrollbar{display:none;}
+      .table-wrap{-webkit-overflow-scrolling:touch;}
+      .data-table{min-width:820px;}
+      .top-actions{flex-wrap:wrap;justify-content:flex-end;}
+      .modal-backdrop{padding:10px;}
+      .modal{max-height:92vh;width:100%;}
+      .modal-foot{flex-wrap:wrap;gap:8px;}
+      .modal-foot button{flex:1 1 auto;}
+      .auth-wrap{padding:16px;}
+      .auth-card h1{font-size:22px;}
+    }
   </style>
 </head>
 <body>

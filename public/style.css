@@ -429,3 +429,12 @@ img { max-width: 100%; height: auto; }
   header { padding: 10px 14px; }
   header .logo { font-size: 1rem; }
 }
+
+/* iPhone 7 en adelante: campos a 16px evita el zoom automático de Safari,
+   se respeta el área segura y las tablas se deslizan con inercia. */
+@media (max-width: 768px) {
+  input, select, textarea { font-size: 16px; }
+  body { padding-left: env(safe-area-inset-left, 0); padding-right: env(safe-area-inset-right, 0); }
+  .table-wrap, .table-responsive, .admin-table-wrap, .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+  button, a, input[type="button"], input[type="submit"] { -webkit-tap-highlight-color: transparent; }
+}
