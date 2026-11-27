@@ -1054,7 +1054,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
-  <script src="push-client.js"></script>
+  <script src="push-client.js?v=20261126d"></script>
   <script>
     // ---------- Asistencia del día ----------
     let asistenciasDiaData = [];
@@ -1422,30 +1422,35 @@
       const estadoEl = document.getElementById('estadoPushAdmin');
       const boton = document.getElementById('btnPushAdmin');
       if (!estadoEl || !window.JJMNotificaciones) return;
-      if (!window.JJMNotificaciones.disponible()) {
+      if (!window.JJMNotificaciones.disponible?.()) {
         estadoEl.textContent = 'Las notificaciones requieren un navegador compatible y una conexión segura (HTTPS).';
         return;
       }
-      const e = await window.JJMNotificaciones.estado('usuario');
-      if (e.suscrito) {
-        estadoEl.textContent = '✅ Activos en este dispositivo. Te llegarán avisos aunque cierres la página.';
-        if (boton) boton.textContent = 'Desactivar avisos';
-      } else if (e.permiso === 'granted') {
-        estadoEl.textContent = 'Permiso concedido, pero este dispositivo aún no está registrado. Presiona Activar avisos.';
-      } else if (e.permiso === 'denied') {
-        estadoEl.textContent = 'Notificaciones bloqueadas. Permítelas en Ajustes del sitio (ícono de candado).';
-      }
+      if (typeof window.JJMNotificaciones.estado !== 'function') return;
+      try {
+        const e = await window.JJMNotificaciones.estado('usuario');
+        if (e.suscrito) {
+          estadoEl.textContent = '✅ Activos en este dispositivo. Te llegarán avisos aunque cierres la página.';
+          if (boton) boton.textContent = 'Desactivar avisos';
+        } else if (e.permiso === 'granted') {
+          estadoEl.textContent = 'Permiso concedido, pero este dispositivo aún no está registrado. Presiona Activar avisos.';
+        } else if (e.permiso === 'denied') {
+          estadoEl.textContent = 'Notificaciones bloqueadas. Permítelas en Ajustes del sitio (ícono de candado).';
+        }
+      } catch { /* Cliente en caché: el botón sigue funcionando. */ }
     }
 
     async function activarNotificacionesAdmin() {
       const estadoEl = document.getElementById('estadoPushAdmin');
       const boton = document.getElementById('btnPushAdmin');
       try {
-        const esActivo = await window.JJMNotificaciones.estado('usuario');
-        if (esActivo.suscrito && boton?.textContent.includes('Desactivar')) {
-          estadoEl.textContent = await window.JJMNotificaciones.desactivar('usuario');
-          if (boton) boton.textContent = 'Activar avisos';
-          return;
+        if (typeof window.JJMNotificaciones.estado === 'function' && typeof window.JJMNotificaciones.desactivar === 'function') {
+          const esActivo = await window.JJMNotificaciones.estado('usuario');
+          if (esActivo.suscrito && boton?.textContent.includes('Desactivar')) {
+            estadoEl.textContent = await window.JJMNotificaciones.desactivar('usuario');
+            if (boton) boton.textContent = 'Activar avisos';
+            return;
+          }
         }
         estadoEl.textContent = await window.JJMNotificaciones.activar('usuario');
         if (boton) boton.textContent = 'Desactivar avisos';

@@ -1,0 +1,10 @@
+# Los archivos de la app deben servirse siempre frescos: si el navegador
+# guarda una versión vieja de push-client.js, los botones de avisos fallan.
+/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/push-client.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/api/*
+  Cache-Control: no-store

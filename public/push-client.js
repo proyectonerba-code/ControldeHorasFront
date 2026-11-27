@@ -1,4 +1,5 @@
 (function () {
+  window.JJM_PUSH_VERSION = '20261126d';
   const PREFIJO_LOCAL = 'jjm_push_vapid_';
 
   function convertirClaveBase64URL(valor) {

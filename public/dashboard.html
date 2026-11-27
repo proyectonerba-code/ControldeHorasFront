@@ -189,7 +189,7 @@
     updateClock();
   </script>
 
-  <script src="/push-client.js"></script>
+  <script src="/push-client.js?v=20261126d"></script>
   <script>
     let ubicacionValida = false;
     let ubicacionActual = { lat: null, lng: null };
@@ -445,28 +445,33 @@
       const estado = document.getElementById('estadoPushTrabajador');
       const boton = document.getElementById('btnPushTrabajador');
       if (!estado || !window.JJMNotificaciones) return;
-      if (!window.JJMNotificaciones.disponible()) {
+      if (!window.JJMNotificaciones.disponible?.()) {
         estado.textContent = 'Este navegador no admite notificaciones push. Usa Chrome o Safari desde HTTPS.';
         return;
       }
-      const e = await window.JJMNotificaciones.estado('usuario');
-      if (e.suscrito) {
-        estado.textContent = '✅ Activos en este dispositivo. Recibirás avisos aunque cierres la página.';
-        if (boton) boton.textContent = 'Desactivar';
-      } else if (e.permiso === 'denied') {
-        estado.textContent = 'Notificaciones bloqueadas. Permítelas en Ajustes del sitio (ícono de candado).';
-      }
+      if (typeof window.JJMNotificaciones.estado !== 'function') return;
+      try {
+        const e = await window.JJMNotificaciones.estado('usuario');
+        if (e.suscrito) {
+          estado.textContent = '✅ Activos en este dispositivo. Recibirás avisos aunque cierres la página.';
+          if (boton) boton.textContent = 'Desactivar';
+        } else if (e.permiso === 'denied') {
+          estado.textContent = 'Notificaciones bloqueadas. Permítelas en Ajustes del sitio (ícono de candado).';
+        }
+      } catch { /* Cliente en caché: el botón sigue funcionando. */ }
     }
 
     async function activarNotificacionesTrabajador() {
       const estado = document.getElementById('estadoPushTrabajador');
       const boton = document.getElementById('btnPushTrabajador');
       try {
-        const actual = await window.JJMNotificaciones.estado('usuario');
-        if (actual.suscrito && boton?.textContent.includes('Desactivar')) {
-          estado.textContent = await window.JJMNotificaciones.desactivar('usuario');
-          if (boton) boton.textContent = 'Activar';
-          return;
+        if (typeof window.JJMNotificaciones.estado === 'function' && typeof window.JJMNotificaciones.desactivar === 'function') {
+          const actual = await window.JJMNotificaciones.estado('usuario');
+          if (actual.suscrito && boton?.textContent.includes('Desactivar')) {
+            estado.textContent = await window.JJMNotificaciones.desactivar('usuario');
+            if (boton) boton.textContent = 'Activar';
+            return;
+          }
         }
         estado.textContent = await window.JJMNotificaciones.activar('usuario');
         if (boton) boton.textContent = 'Desactivar';
