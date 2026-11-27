@@ -157,6 +157,10 @@
     .sidebar-team strong{display:block;font:600 10px 'Space Grotesk',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#760009;}
     .sidebar-team span{display:block;margin-top:4px;font-size:12px;color:#565e74;}
     .admin-side-nav{display:flex;flex-direction:column;gap:3px;overflow-y:auto;}
+    /* Evita que Android muestre la barrita/deslizador horizontal al fondo del menú. */
+    .admin-sidebar,.admin-side-nav{scrollbar-width:none;-ms-overflow-style:none;}
+    .admin-sidebar::-webkit-scrollbar,.admin-side-nav::-webkit-scrollbar{width:0;height:0;display:none;}
+    @media(max-width:900px){.admin-sidebar,.admin-sidebar.collapsed .admin-side-nav{overflow-x:hidden;}}
     .admin-nav-group-label{margin:16px 9px 6px;font:600 10px 'Space Grotesk',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#707b91;}
     .admin-nav-link{width:100%;min-height:40px;display:flex;align-items:center;gap:11px;padding:9px 10px;border:0;border-left:3px solid transparent;background:transparent;color:#364158;text-align:left;font:500 13px 'Geist',sans-serif;cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
     .admin-nav-link .material-symbols-outlined{font-size:18px;color:#66738b;}
