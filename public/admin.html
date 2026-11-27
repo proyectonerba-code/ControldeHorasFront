@@ -581,11 +581,12 @@
     <div id="modalAvisoEquipo" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-labelledby="tituloAvisoEquipo">
       <div class="w-full max-w-lg bg-surface-container-lowest shadow-2xl overflow-hidden">
         <div class="px-5 py-4 bg-primary text-on-primary flex items-start justify-between gap-3">
-          <div><h2 id="tituloAvisoEquipo" class="font-title-sm text-title-sm font-bold">Enviar aviso a mi equipo</h2><p class="text-xs opacity-85 mt-1">Llega como notificación a todos tus trabajadores.</p></div>
+          <div><h2 id="tituloAvisoEquipo" class="font-title-sm text-title-sm font-bold">Enviar aviso</h2><p class="text-xs opacity-85 mt-1">Llega a la bandeja y al celular de quienes elijas.</p></div>
           <button type="button" class="text-2xl leading-none opacity-80 hover:opacity-100" aria-label="Cerrar" onclick="cerrarAvisoEquipo()">×</button>
         </div>
         <form id="formAvisoEquipo">
           <div class="p-5 space-y-4">
+            <div><label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-1" for="avisoEquipoAudiencia">Destinatarios</label><select id="avisoEquipoAudiencia" class="w-full border border-outline-variant px-3 py-2.5 text-sm"><option value="trabajadores">Mis trabajadores</option><option value="equipo">Todo mi equipo (incluido yo)</option></select></div>
             <div><label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-1" for="avisoEquipoTitulo">Título</label><input id="avisoEquipoTitulo" maxlength="90" required class="w-full border border-outline-variant px-3 py-2.5 text-sm" placeholder="Ej: Reunión importante"></div>
             <div><label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-1" for="avisoEquipoCuerpo">Mensaje</label><textarea id="avisoEquipoCuerpo" rows="4" maxlength="400" required class="w-full border border-outline-variant px-3 py-2.5 text-sm" placeholder="Escribe el aviso que recibirán..."></textarea></div>
             <div><label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-1" for="avisoEquipoUrl">Al abrir, llevar a</label><select id="avisoEquipoUrl" class="w-full border border-outline-variant px-3 py-2.5 text-sm"><option value="/dashboard.html">Registrar asistencia</option><option value="/admin.html">Panel del administrador</option></select></div>
@@ -1238,6 +1239,7 @@
       cargarVacaciones();
       cargarNotificaciones();
       actualizarEstadoPushAdmin();
+      window.JJMNotificaciones?.pedirAlPrimerToque('usuario');
       // Refresco en segundo plano: el código y los nuevos miembros aparecen solos.
       window.setInterval(() => {
         if (vistaAdminActual === 'asistencia') cargarAsistenciasDia();
@@ -1376,7 +1378,8 @@
           body: JSON.stringify({
             titulo: document.getElementById('avisoEquipoTitulo').value,
             cuerpo: document.getElementById('avisoEquipoCuerpo').value,
-            url: document.getElementById('avisoEquipoUrl').value
+            url: document.getElementById('avisoEquipoUrl').value,
+            audiencia: document.getElementById('avisoEquipoAudiencia').value
           })
         });
         const data = await res.json();

@@ -214,6 +214,7 @@
       await cargarAvisos();
       window.setInterval(cargarAvisos, 8000);
       actualizarEstadoPushTrabajador();
+      window.JJMNotificaciones?.pedirAlPrimerToque('usuario');
     }
 
     async function cargarAvisos() {

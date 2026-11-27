@@ -85,20 +85,45 @@
     const base = { soportado: soportado(), permiso: soportado() ? Notification.permission : 'no-soportado', suscrito: false };
     if (!base.soportado || base.permiso !== 'granted') return base;
     try {
-      const registration = await navigator.serviceWorker.getRegistration('/');
-      let subscription = await registration?.pushManager.getSubscription();
-      base.suscrito = Boolean(subscription);
-      if (!subscription) return base;
       const config = await obtenerConfig(scope);
+      let registration = await navigator.serviceWorker.getRegistration('/');
+      if (!registration) registration = await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await suscribir(registration, config.clave_publica);
+        await guardarSuscripcion(scope, subscription);
+        guardarClave(scope, config.clave_publica);
+        base.suscrito = true;
+        return base;
+      }
+      base.suscrito = true;
       if (leerClave(scope) !== config.clave_publica) {
         await subscription.unsubscribe();
         subscription = await suscribir(registration, config.clave_publica);
         await guardarSuscripcion(scope, subscription);
         guardarClave(scope, config.clave_publica);
-        base.suscrito = true;
       }
     } catch { /* Sin sesión o sin conexión: se reporta lo que se pudo saber. */ }
     return base;
+  }
+
+  // El navegador solo permite pedir permiso dentro de un gesto del usuario.
+  // Se pregunta una sola vez, al primer toque tras iniciar sesión.
+  function pedirAlPrimerToque(scopeParam) {
+    const scope = scopeParam || scopeActual();
+    if (!soportado() || Notification.permission !== 'default') return;
+    const marca = 'jjm_push_preguntado_' + scope;
+    try { if (localStorage.getItem(marca)) return; } catch { /* noop */ }
+    const handler = async () => {
+      document.removeEventListener('pointerdown', handler, true);
+      document.removeEventListener('click', handler, true);
+      try {
+        await activar(scope);
+        try { localStorage.setItem(marca, '1'); } catch { /* noop */ }
+      } catch { /* Si no hay sesión o se rechaza, se reintentará en otro acceso. */ }
+    };
+    document.addEventListener('pointerdown', handler, true);
+    document.addEventListener('click', handler, true);
   }
 
   async function desactivar(scopeParam) {
@@ -115,6 +140,7 @@
     disponible: soportado,
     activar,
     estado,
-    desactivar
+    desactivar,
+    pedirAlPrimerToque
   };
 })();
